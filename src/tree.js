@@ -9,3 +9,11 @@ export function visitNodes(tree, fun) {
   }
   recur(tree, 0);
 }
+
+export function numDescendants(tree) {
+  let num = 0;
+  visitNodes(tree, () => {
+    num++;
+  });
+  return num;
+}
