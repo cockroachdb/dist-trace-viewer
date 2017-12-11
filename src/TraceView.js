@@ -8,6 +8,52 @@ const HEIGHT_PLUS_SPACE = HEIGHT + 5;
 const DOWN_ARROW = '▼';
 const SIDE_ARROW = '▶';
 
+const TOGGLE_COLLAPSED = 'TOGGLE_COLLAPSED';
+const toggleCollapsed = (spanID) => ({
+  type: TOGGLE_COLLAPSED,
+  spanID,
+});
+
+const HOVER_SPAN = 'HOVER_SPAN';
+const hoverSpan = (spanID) => ({
+  type: HOVER_SPAN,
+  spanID,
+});
+
+const UN_HOVER_SPAN = 'UN_HOVER_SPAN';
+const unHoverSpan = {
+  type: UN_HOVER_SPAN,
+};
+
+export const initialState = {
+  hoveredSpan: null,
+  collapsedSpans: [],
+};
+
+export function update(state, action) {
+  switch (action.type) {
+    case TOGGLE_COLLAPSED: {
+      const isCollapsed = state.collapsedSpans.includes(action.spanID);
+      return {
+        ...state,
+        collapsedSpans: isCollapsed
+          ? state.collapsedSpans.filter((spanID) => (spanID !== action.spanID))
+          : [...state.collapsedSpans, action.spanID],
+      };
+    }
+    case HOVER_SPAN:
+      return {
+        ...state,
+        hoveredSpan: action.spanID,
+      };
+    case UN_HOVER_SPAN:
+      return {
+        ...state,
+        hoveredSpan: null,
+      };
+  }
+}
+
 function flatten(tree, collapsed) {
   const output = [];
   function recur(node) {
@@ -33,48 +79,20 @@ function lerp(omin, omax, imin, imax) {
 
 class TraceView extends Component {
 
-  constructor() {
-    super();
-    this.state = {
-      hoveredSpan: null,
-      collapsedSpans: [],
-    };
-  }
-
-  handleMouseOver = (spanID) => {
-    this.setState({
-      hoveredSpan: spanID,
-    })
-  }
-
-  handleMouseOut = () => {
-    this.setState({
-      hoveredSpan: null,
-    });
-  }
-
-  toggleCollapsed = (spanID) => {
-    const collapsed = this.state.collapsedSpans;
-    if (collapsed.includes(spanID)) {
-      const index = collapsed.indexOf(spanID);
-      collapsed.splice(index, 1);
-    } else {
-      collapsed.push(spanID);
-    }
-    this.setState({
-      collapsedSpans: collapsed,
-    });
+  handleAction = (action) => {
+    this.props.handleAction(action);
   }
 
   render() {
     const {
       trace,
       width,
+      traceState,
     } = this.props;
     const {
       collapsedSpans,
       hoveredSpan,
-    } = this.state;
+    } = traceState;
     const flattened = flatten(trace, collapsedSpans);
     // TODO: don't compute this every frame
     const lastTS = _.max(flattened.map((span) => (span.startTS + span.duration)));
@@ -96,9 +114,9 @@ class TraceView extends Component {
             <g
               key={span.id}
               style={{ cursor: "pointer" }}
-              onMouseOver={() => { this.handleMouseOver(span.id); }}
-              onMouseOut={() => { this.handleMouseOut(); }}
-              onClick={() => { this.toggleCollapsed(span.id); }}
+              onMouseOver={() => { this.handleAction(hoverSpan(span.id)); }}
+              onMouseOut={() => { this.handleAction(unHoverSpan); }}
+              onClick={() => { this.handleAction(toggleCollapsed(span.id)); }}
             >
               <rect
                 fill={isHovered ? "blue" : "lightblue"}

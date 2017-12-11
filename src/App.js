@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
-import TraceView from "./TraceView";
+import TraceView, { update, initialState } from "./TraceView";
 import _ from "lodash";
 import './App.css';
+import { visitNodes } from './tree';
 
 let id = 0;
 
@@ -56,12 +57,63 @@ const TRACE = {
   ],
 };
 
+function indexById(trace) {
+  const output = {};
+  visitNodes(trace, (node) => {
+    output[node.id] = node;
+  });
+  return output;
+}
+
+const SPANS_BY_ID = indexById(TRACE);
+
+function withoutChildren(span) {
+  const output = {...span};
+  if (output.children) {
+    delete output.children;
+  }
+  return output;
+}
+
 class App extends Component {
+
+  constructor() {
+    super();
+    this.state = {
+      traceState: initialState,
+    };
+  }
+
+  onAction = (action) => {
+    this.setState({
+      traceState: update(this.state.traceState, action),
+    });
+  }
+
   render() {
     return (
-      <div className="App">
-        <TraceView trace={TRACE} width={800} />
-      </div>
+      <table>
+        <tbody>
+          <tr>
+            <td>
+              <TraceView
+                trace={TRACE}
+                traceState={this.state.traceState}
+                width={800}
+                handleAction={(action) => this.onAction(action)}
+              />
+            </td>
+            <td style={{ verticalAlign: "top" }}>
+              <pre>
+                {JSON.stringify(
+                  withoutChildren(SPANS_BY_ID[this.state.traceState.hoveredSpan]),
+                  null, 2
+                )}
+              </pre>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     );
   }
 }
