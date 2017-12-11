@@ -2,13 +2,19 @@
   "name": "dist-tracing-view",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://vilterp.github.io/dist-tracing-view",
   "dependencies": {
     "lodash": "^4.17.4",
     "react": "^16.2.0",
     "react-dom": "^16.2.0",
     "react-scripts": "1.0.17"
   },
+  "devDependencies": {
+    "gh-pages": "^1.1.0"
+  },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
