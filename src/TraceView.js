@@ -117,7 +117,7 @@ class TraceView extends Component {
               key={span.id}
               style={{ cursor: "pointer" }}
               onMouseOver={() => { this.handleAction(hoverSpan(span.id)); }}
-              onMouseOut={() => { this.handleAction(unHoverSpan); }}
+              // onMouseOut={() => { this.handleAction(unHoverSpan); }}
               onClick={() => { this.handleAction(toggleCollapsed(span.id)); }}
             >
               <rect
