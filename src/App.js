@@ -1,21 +1,24 @@
 import React from "react";
 import TraceAndSidebar from "./TraceAndSidebar";
-import exampleTrace from "./exampleTrace";
 
-function parseTrace(text) {
-  return JSON.parse(text);
-}
+import "./csvToTrace";
+import exampleTraceCSV from "./exampleTraceCSV";
+import { parseTrace } from "./csvToTrace";
 
-function serializeTrace(trace) {
-  return JSON.stringify(trace, null, 2);
-}
+// function parseTrace(text) {
+//   return JSON.parse(text);
+// }
+
+// function serializeTrace(trace) {
+//   return JSON.stringify(trace, null, 2);
+// }
 
 class App extends React.Component {
   constructor() {
     super();
     this.state = {
       parseError: null,
-      traceText: "",
+      traceText: exampleTraceCSV,
       trace: null,
     };
   }
@@ -41,14 +44,13 @@ class App extends React.Component {
 
   handleExample = () => {
     this.setState({
-      trace: exampleTrace,
+      traceText: exampleTraceCSV,
     });
   }
 
   handleClearTrace = () => {
     this.setState({
       trace: null,
-      traceText: serializeTrace(this.state.trace),
     });
   }
 

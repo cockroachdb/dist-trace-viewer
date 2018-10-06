@@ -105,7 +105,7 @@ class TraceView extends Component {
         {flattened.map((span, idx) => {
           const isHovered = hoveredSpan === span.id;
           const isCollapsed = collapsedSpans.includes(span.id);
-          const timeLabel = `${span.duration * 13}ms`;
+          const timeLabel = `${span.duration}ms`;
           const isLeaf = !!span.children;
           const label = !isLeaf
             ? `${timeLabel} : ${span.name}`
