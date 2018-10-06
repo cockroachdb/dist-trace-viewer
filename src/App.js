@@ -57,7 +57,8 @@ class App extends React.Component {
   render() {
     if (this.state.trace === null) {
       return (
-        <div>
+        <div style={{ paddingLeft: 50, paddingTop: 10 }}>
+          <h1>Paste A Trace as CSV</h1>
           <textarea
             value={this.state.traceText}
             onChange={this.handleChangeTraceText}
@@ -68,11 +69,22 @@ class App extends React.Component {
           <br />
           <button onClick={this.handleSubmit}>Visualize</button>
           <br />
-          {this.state.parseError ? <pre>Parse error: {this.state.parseError}</pre> : null}
+          {this.state.parseError
+            ? <pre style={{ whiteSpace: "pre-wrap" }}>Parse error: {this.state.parseError.message}</pre>
+            : null}
           <br />
           <button onClick={this.handleExample}>Example</button>
+          <h3>How to get a trace as CSV</h3>
+          <p>In the SQL prompt:</p>
+          <pre>
+            SET tracing = on;<br />
+            ...your statement here...;<br />
+            SET tracing = off;<br />
+            \set display_format = csv;<br />
+            SELECT * FROM crdb_internal.session_trace;
+          </pre>
         </div>
-      )
+      );
     }
 
     return (
