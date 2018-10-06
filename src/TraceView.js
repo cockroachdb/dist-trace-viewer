@@ -51,6 +51,8 @@ export function update(state, action) {
         ...state,
         hoveredSpan: null,
       };
+    default:
+      return state;
   }
 }
 
