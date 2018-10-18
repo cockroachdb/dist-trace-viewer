@@ -13,44 +13,54 @@ const SPAN_IDX_COL = 0;
 const AGE_COL = 8;
 const MESSAGE_COL = 7;
 
-function rowsToTree(allRows) {
-  function recur(rows, idx, id) {
-    const message = rows[idx][MESSAGE_COL];
-    if (!message.startsWith(SPAN_START)) {
-      throw new Error(`expected SPAN START; found ${message}`);
-    }
-
-    const spanName = message.slice(SPAN_START.length, message.length - SPAN_END.length);
-
-    const spanIdx = rows[idx][SPAN_IDX_COL];
+function rowsToTree(rows) {
+  function recur(startIdx) {
+    const startRow = rows[startIdx];
+    const startRowMessage = startRow[MESSAGE_COL];
+    const spanIdx = startRow[SPAN_IDX_COL];
     const logMessages = [];
-    for (let i = idx + 1; i < rows.length; i++) {
+    const children = [];
+    let i = startIdx + 1;
+    while (i < rows.length) {
       const row = rows[i];
+      const rowMessage = row[MESSAGE_COL];
       if (row[SPAN_IDX_COL] === spanIdx) {
         logMessages.push({
           age: row[AGE_COL],
-          message: row[MESSAGE_COL],
-        })
+          message: rowMessage,
+        });
+      } else if (rowMessage.startsWith(SPAN_START)) {
+        const { node, endIdx } = recur(i);
+        children.push(node);
+        i = endIdx;
       }
+      i++;
     }
 
     return {
-      id: 0,
-      name: spanName,
-      startTS: 0,
-      duration: 10,
-      props: {},
-      children: [],
-      logMessages,
+      node: {
+        id: rows[startIdx],
+        name: startRowMessage.slice(SPAN_START.length, startRowMessage.length - SPAN_END.length),
+        startTS: 0,
+        duration: 10,
+        props: {},
+        children,
+        logMessages,
+      },
+      endIdx: i,
     };
   }
 
-  return recur(allRows, 1, 0);
+  const message = rows[1][MESSAGE_COL];
+  if (!message.startsWith(SPAN_START)) {
+    throw new Error(`expected SPAN START; found ${message}`);
+  }
+
+  return recur(1).node; // skip header
 }
 
 function parseCSV(csvText) {
   const parseRes = Papa.parse(csvText);
-  console.log(parseRes);
 
   if (parseRes.errors.length > 0) {
     throw new Error(`parse errors: ${parseRes.errors.join(", ")}`);

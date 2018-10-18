@@ -132,9 +132,10 @@ cockroach.stat.tablereader.stalltime: 46µs",4s707ms304μs
 16,4,2018-10-06 13:34:19.895835+00:00,NULL,/cockroach.roachpb.Internal/Batch,,"[n1,s1,r106/1:/Table/55/{1/0/1/-…-2}]",read has no clock uncertainty,4s709ms624μs
 16,5,2018-10-06 13:34:19.895843+00:00,NULL,/cockroach.roachpb.Internal/Batch,,"[n1,s1,r106/1:/Table/55/{1/0/1/-…-2}]",command queue,4s709ms632μs
 16,6,2018-10-06 13:34:19.895882+00:00,NULL,/cockroach.roachpb.Internal/Batch,,"[n1,s1,r106/1:/Table/55/{1/0/1/-…-2}]",waiting for read lock,4s709ms671μs
-16,7,2018-10-06 13:34:19.896024+00:00,NULL,/cockroach.roachpb.Internal/Batch,,"[n1,s1,r106/1:/Table/55/{1/0/1/-…-2}]",read completed,4s709ms813μs
-17,0,2018-10-06 13:34:19.893244+00:00,6ms144μs694ns,outbox,,,"=== SPAN START: outbox ===
-cockroach.stat.outbox.bytes_sent: ิ
-cockroach.streamid: 0",4s707ms33μs
-18,0,2018-10-06 13:34:19.893332+00:00,NULL,[async] drain,,,=== SPAN START: [async] drain ===,4s707ms121μs
-18,1,2018-10-06 13:34:19.893638+00:00,NULL,[async] drain,,[n4],Consumer sent handshake. Consuming flow scheduled: true,4s707ms427μs`;
+16,7,2018-10-06 13:34:19.896024+00:00,NULL,/cockroach.roachpb.Internal/Batch,,"[n1,s1,r106/1:/Table/55/{1/0/1/-…-2}]",read completed,4s709ms813μs`
+
+// 17,0,2018-10-06 13:34:19.893244+00:00,6ms144μs694ns,outbox,,,"=== SPAN START: outbox ===
+// cockroach.stat.outbox.bytes_sent: ิ
+// cockroach.streamid: 0",4s707ms33μs
+// 18,0,2018-10-06 13:34:19.893332+00:00,NULL,[async] drain,,,=== SPAN START: [async] drain ===,4s707ms121μs
+// 18,1,2018-10-06 13:34:19.893638+00:00,NULL,[async] drain,,[n4],Consumer sent handshake. Consuming flow scheduled: true,4s707ms427μs`;

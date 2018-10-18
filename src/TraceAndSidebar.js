@@ -38,7 +38,7 @@ class TraceAndSidebar extends Component {
     return (
       <div>
         <table>
-          <tbody>
+          <tbody style={{ textAlign: "left" }}>
             <tr>
               <th>Name:</th>
               <td>{span.name}</td>
