@@ -3,7 +3,6 @@ import { createSelector } from 'reselect';
 
 import TraceView, { update, initialState } from "./TraceView";
 import { visitNodes } from "./tree";
-import './TraceAndSidebar.css';
 
 function indexById(trace) {
   const output = {};
@@ -36,7 +35,7 @@ class TraceAndSidebar extends Component {
     }
 
     return (
-      <div>
+      <div style={{ padding: 10 }}>
         <table>
           <tbody style={{ textAlign: "left" }}>
             <tr>
@@ -58,7 +57,7 @@ class TraceAndSidebar extends Component {
           </tbody>
         </table>
         <h3>Log Messages</h3>
-        <table>
+        <table className="table table-sm">
           <thead>
             <tr>
               <th>Age</th>

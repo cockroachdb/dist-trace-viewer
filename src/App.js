@@ -65,15 +65,16 @@ class App extends React.Component {
             style={{ fontFamily: "monospace" }}
             cols="80"
             rows="30"
+            spellCheck={false}
           />
           <br />
-          <button onClick={this.handleSubmit}>Visualize</button>
+          <button onClick={this.handleSubmit} className="btn btn-primary">Visualize</button>
           <br />
           {this.state.parseError
             ? <pre style={{ whiteSpace: "pre-wrap" }}>Parse error: {this.state.parseError.message}</pre>
             : null}
           <br />
-          <button onClick={this.handleExample}>Example</button>
+          <button onClick={this.handleExample} className="btn btn-secondary">Example</button>
           <h3>How to get a trace as CSV</h3>
           <p>In the SQL prompt:</p>
           <pre>
@@ -88,8 +89,8 @@ class App extends React.Component {
     }
 
     return (
-      <div>
-        <button onClick={this.handleClearTrace}>Clear Trace</button>
+      <div style={{ padding: 10 }}>
+        <button onClick={this.handleClearTrace} className="btn btn-secondary btn-sm">Clear Trace</button>
         <TraceAndSidebar trace={this.state.trace} />
       </div>
     );
