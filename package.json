@@ -1,23 +1,36 @@
 {
-  "name": "dist-tracing-view",
+  "name": "traceviz",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://vilterp.github.io/dist-tracing-view",
   "dependencies": {
+    "@types/jest": "23.3.7",
+    "@types/lodash": "^4.14.117",
+    "@types/luxon": "^1.4.0",
+    "@types/papaparse": "^4.5.4",
+    "@types/react": "16.4.18",
+    "@types/react-dom": "16.0.9",
     "lodash": "^4.17.4",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0",
-    "react-scripts": "1.0.17"
-  },
-  "devDependencies": {
-    "gh-pages": "^1.1.0"
+    "luxon": "^1.4.4",
+    "papaparse": "^4.6.1",
+    "react": "^16.6.0",
+    "react-dom": "^16.6.0",
+    "react-scripts": "2.0.6-next.c662dfb0",
+    "reselect": "^4.0.0",
+    "typescript": "3.1.3"
   },
   "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test --env=jsdom",
+    "test": "react-scripts test",
     "eject": "react-scripts eject"
-  }
+  },
+  "eslintConfig": {
+    "extends": "react-app"
+  },
+  "browserslist": [
+    ">0.2%",
+    "not dead",
+    "not ie <= 11",
+    "not op_mini all"
+  ]
 }
