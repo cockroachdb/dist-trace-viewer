@@ -1,21 +1,19 @@
 import React from "react";
 import TraceAndSidebar from "./TraceAndSidebar";
 
-import "./csvToTrace";
+import "./trace";
 import exampleTraceCSV from "./exampleTraceCSV";
-import { parseTrace } from "./csvToTrace";
+import { parseTrace, TraceNode } from "./trace";
 
-// function parseTrace(text) {
-//   return JSON.parse(text);
-// }
+interface AppState {
+  parseError: Error;
+  traceText: string;
+  trace: TraceNode;
+}
 
-// function serializeTrace(trace) {
-//   return JSON.stringify(trace, null, 2);
-// }
-
-class App extends React.Component {
+class App extends React.Component<{}, AppState> {
   constructor() {
-    super();
+    super({});
     this.state = {
       parseError: null,
       traceText: exampleTraceCSV,
@@ -63,8 +61,8 @@ class App extends React.Component {
             value={this.state.traceText}
             onChange={this.handleChangeTraceText}
             style={{ fontFamily: "monospace" }}
-            cols="80"
-            rows="30"
+            cols={80}
+            rows={30}
             spellCheck={false}
           />
           <br />

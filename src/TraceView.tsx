@@ -1,6 +1,7 @@
 import _ from "lodash";
 import React, { Component } from "react";
 import { numDescendants } from "./tree";
+import { TraceNode } from "./trace";
 
 const HEIGHT = 30;
 const HEIGHT_PLUS_SPACE = HEIGHT + 5;
@@ -25,31 +26,48 @@ const unHoverSpan = {
   type: UN_HOVER_SPAN,
 };
 
-export const initialState = {
-  hoveredSpan: null,
-  collapsedSpans: [],
+interface TraceViewProps {
+  trace: TraceNode;
+  width: number;
+  traceState: TraceViewState;
+  handleAction: (action: any) => void;
+}
+
+export interface TraceViewState {
+  hoveredSpanID: number;
+  collapsedSpanIDs: number[];
+}
+
+export const initialState: TraceViewState = {
+  hoveredSpanID: null,
+  collapsedSpanIDs: [],
 };
 
-export function update(state, action) {
+interface Action {
+  type: string;
+  spanID?: number;
+}
+
+export function update(state: TraceViewState, action: Action): TraceViewState {
   switch (action.type) {
     case TOGGLE_COLLAPSED: {
-      const isCollapsed = state.collapsedSpans.includes(action.spanID);
+      const isCollapsed = state.collapsedSpanIDs.includes(action.spanID);
       return {
         ...state,
-        collapsedSpans: isCollapsed
-          ? state.collapsedSpans.filter((spanID) => (spanID !== action.spanID))
-          : [...state.collapsedSpans, action.spanID],
+        collapsedSpanIDs: isCollapsed
+          ? state.collapsedSpanIDs.filter((spanID) => (spanID !== action.spanID))
+          : [...state.collapsedSpanIDs, action.spanID],
       };
     }
     case HOVER_SPAN:
       return {
         ...state,
-        hoveredSpan: action.spanID,
+        hoveredSpanID: action.spanID,
       };
     case UN_HOVER_SPAN:
       return {
         ...state,
-        hoveredSpan: null,
+        hoveredSpanID: null,
       };
     default:
       return state;
@@ -73,13 +91,13 @@ function flatten(tree, collapsed) {
   return output;
 }
 
-function lerp(omin, omax, imin, imax) {
-  return (input) => {
+function lerp(omin: number, omax: number, imin: number, imax: number): (val: number) => number {
+  return (input: number): number => {
     return omin + (omax - omin) * (input - imin) / (imax - imin);
   }
 }
 
-class TraceView extends Component {
+class TraceView extends Component<TraceViewProps> {
 
   handleAction = (action) => {
     this.props.handleAction(action);
@@ -92,10 +110,10 @@ class TraceView extends Component {
       traceState,
     } = this.props;
     const {
-      collapsedSpans,
-      hoveredSpan,
+      collapsedSpanIDs,
+      hoveredSpanID,
     } = traceState;
-    const flattened = flatten(trace, collapsedSpans);
+    const flattened = flatten(trace, collapsedSpanIDs);
     // TODO: don't compute this every frame
     const lastTS = _.max(flattened.map((span) => (span.startTS + span.duration)));
     const scale = lerp(0, width, 0, lastTS);
@@ -103,8 +121,8 @@ class TraceView extends Component {
     return (
       <svg width={width} height="2000" style={{ border: "1px solid black" }}>
         {flattened.map((span, idx) => {
-          const isHovered = hoveredSpan === span.id;
-          const isCollapsed = collapsedSpans.includes(span.id);
+          const isHovered = hoveredSpanID === span.id;
+          const isCollapsed = collapsedSpanIDs.includes(span.id);
           const timeLabel = `${span.duration}ms`;
           const isLeaf = !!span.children;
           const label = !isLeaf

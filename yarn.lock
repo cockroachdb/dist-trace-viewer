@@ -805,10 +805,22 @@
   resolved "https://registry.yarnpkg.com/@types/jest/-/jest-23.3.7.tgz#77f9a4332ccf8db680a31818ade3ee454c831a79"
   integrity sha512-N0p6mHrS0RHC3A9hHN4QH1RM2fGSb2E8rt6ONEK5xKSnyKtn/JAhr1VritkCn6cdyDBephVB80THqJGWzK8FAw==
 
+"@types/lodash@^4.14.117":
+  version "4.14.117"
+  resolved "https://registry.yarnpkg.com/@types/lodash/-/lodash-4.14.117.tgz#695a7f514182771a1e0f4345d189052ee33c8778"
+  integrity sha512-xyf2m6tRbz8qQKcxYZa7PA4SllYcay+eh25DN3jmNYY6gSTL7Htc/bttVdkqj2wfJGbeWlQiX8pIyJpKU+tubw==
+
 "@types/node@*":
   version "10.12.0"
   resolved "https://registry.yarnpkg.com/@types/node/-/node-10.12.0.tgz#ea6dcbddbc5b584c83f06c60e82736d8fbb0c235"
   integrity sha512-3TUHC3jsBAB7qVRGxT6lWyYo2v96BMmD2PTcl47H25Lu7UXtFH/2qqmKiVrnel6Ne//0TFYf6uvNX+HW2FRkLQ==
+
+"@types/papaparse@^4.5.4":
+  version "4.5.4"
+  resolved "https://registry.yarnpkg.com/@types/papaparse/-/papaparse-4.5.4.tgz#3c52c95fe31688ffe3c21c892791f981223cc821"
+  integrity sha512-Zpgl4HpeiKAs3i1gIsHJZrH6zhS7OLI8JAbkl0vjno08glm9uJ78m4KvqOBz1OsfoO+jQWj4d6g9ET9l1d7bgw==
+  dependencies:
+    "@types/node" "*"
 
 "@types/prop-types@*":
   version "15.5.6"

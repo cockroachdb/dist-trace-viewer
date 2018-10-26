@@ -1,9 +1,24 @@
 import _ from "lodash";
 import Papa from "papaparse";
 
-export function parseTrace(csvText) {
+export interface LogMessage {
+  age: number; // ns
+  message: string;
+}
+
+export interface TraceNode {
+  id: number;
+  name: string;
+  startTS: number; // TODO(vilterp): use Luxon timestamp type here
+  duration: number; // ns
+  props: { [key: string]: string };
+  logMessages: LogMessage[];
+  children: TraceNode[];
+}
+
+export function parseTrace(csvText: string): TraceNode {
   const parsedCSV = parseCSV(csvText);
-  return rowsToTree(parsedCSV)
+  return rowsToTree(parsedCSV);
 }
 
 const SPAN_START = "=== SPAN START: ";
@@ -13,8 +28,8 @@ const SPAN_IDX_COL = 0;
 const AGE_COL = 8;
 const MESSAGE_COL = 7;
 
-function rowsToTree(rows) {
-  function recur(startIdx) {
+function rowsToTree(rows: string[][]) {
+  function recur(startIdx: number) {
     const startRow = rows[startIdx];
     const startRowMessage = startRow[MESSAGE_COL];
     const spanIdx = startRow[SPAN_IDX_COL];
@@ -39,7 +54,7 @@ function rowsToTree(rows) {
 
     return {
       node: {
-        id: rows[startIdx],
+        id: startIdx,
         name: startRowMessage.slice(SPAN_START.length, startRowMessage.length - SPAN_END.length),
         startTS: 0,
         duration: 10,
@@ -59,7 +74,7 @@ function rowsToTree(rows) {
   return recur(1).node; // skip header
 }
 
-function parseCSV(csvText) {
+function parseCSV(csvText: string): string[][] {
   const parseRes = Papa.parse(csvText);
 
   if (parseRes.errors.length > 0) {

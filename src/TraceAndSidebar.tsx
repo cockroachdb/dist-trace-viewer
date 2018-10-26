@@ -1,8 +1,9 @@
 import React, { Component } from 'react';
 import { createSelector } from 'reselect';
 
-import TraceView, { update, initialState } from "./TraceView";
+import TraceView, { update, initialState, TraceViewState } from "./TraceView";
 import { visitNodes } from "./tree";
+import { TraceNode } from './trace';
 
 function indexById(trace) {
   const output = {};
@@ -14,10 +15,18 @@ function indexById(trace) {
 
 const indexByIdSelector = createSelector(t => t, indexById);
 
-class TraceAndSidebar extends Component {
+interface TraceAndSidebarProps {
+  trace: TraceNode;
+}
 
-  constructor() {
-    super();
+interface TraceAndSidebarState {
+  traceState: TraceViewState;
+}
+
+class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarState> {
+
+  constructor(props: TraceAndSidebarProps) {
+    super(props);
     this.state = {
       traceState: initialState,
     };
@@ -91,7 +100,7 @@ class TraceAndSidebar extends Component {
           />
         </div>
         <div>
-          {this.renderSidebar(spansByID[this.state.traceState.hoveredSpan])}
+          {this.renderSidebar(spansByID[this.state.traceState.hoveredSpanID])}
         </div>
       </div>
     );
