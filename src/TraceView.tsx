@@ -123,7 +123,7 @@ class TraceView extends Component<TraceViewProps> {
         {flattened.map((span, idx) => {
           const isHovered = hoveredSpanID === span.spanID;
           const isCollapsed = _.includes(collapsedSpanIDs, span.spanID);
-          const timeLabel = `${span.duration}ms`;
+          const timeLabel = `${span.duration}ns`;
           const isLeaf = !!span.children;
           const label = !isLeaf
             ? `${timeLabel} : ${span.operation}`
