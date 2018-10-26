@@ -3,17 +3,17 @@ import TraceAndSidebar from "./TraceAndSidebar";
 
 import "./trace";
 import exampleTraceCSV from "./exampleTraceCSV";
-import { parseTrace, TraceNode } from "./trace";
+import { parseCSV, TraceNode } from "./trace";
 
 interface AppState {
-  parseError: Error;
+  parseError: Error | null;
   traceText: string;
-  trace: TraceNode;
+  trace: TraceNode | null;
 }
 
 class App extends React.Component<{}, AppState> {
-  constructor() {
-    super({});
+  constructor(props: {}) {
+    super(props);
     this.state = {
       parseError: null,
       traceText: exampleTraceCSV,
@@ -21,15 +21,15 @@ class App extends React.Component<{}, AppState> {
     };
   }
 
-  handleChangeTraceText = (evt) => {
+  handleChangeTraceText = (evt: React.FormEvent<HTMLTextAreaElement>) => {
     this.setState({
-      traceText: evt.target.value,
+      traceText: evt.currentTarget.value,
     });
   }
 
   handleSubmit = () => {
     try {
-      const trace = parseTrace(this.state.traceText);
+      const trace = parseCSV(this.state.traceText);
       this.setState({
         trace,
       });

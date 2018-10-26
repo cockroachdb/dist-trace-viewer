@@ -1,5 +1,7 @@
-export function visitNodes(tree, fun) {
-  function recur(node, depth) {
+import { TraceNode } from "./trace";
+
+export function visitNodes(tree: TraceNode, fun: (tn: TraceNode, depth: number) => void) {
+  function recur(node: TraceNode, depth: number) {
     fun(node, depth);
     if (node.children) {
       node.children.forEach((n) => {
@@ -10,7 +12,7 @@ export function visitNodes(tree, fun) {
   recur(tree, 0);
 }
 
-export function numDescendants(tree) {
+export function numDescendants(tree: TraceNode) {
   let num = 0;
   visitNodes(tree, () => {
     num++;
