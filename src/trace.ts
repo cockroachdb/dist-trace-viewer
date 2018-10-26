@@ -61,7 +61,9 @@ function parseDuration(dur: string): number {
 }
 
 function parseRow(columns: string[]): TraceNode {
-  if (columns.length !== EXPECTED_HEADING.length) {}
+  if (columns.length !== EXPECTED_HEADING.length) {
+    throw new Error(`expected ${EXPECTED_HEADING.length} columns; got ${columns.length}: ${columns}`)
+  }
   return {
     spanID: parseInt(columns[0]),
     timestamp: DateTime.fromSQL(columns[2], { zone: 'utc' }),

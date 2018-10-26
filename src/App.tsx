@@ -34,6 +34,7 @@ class App extends React.Component<{}, AppState> {
         trace,
       });
     } catch (e) {
+      console.error("parse error:", e);
       this.setState({
         parseError: e,
       });
