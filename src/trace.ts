@@ -45,7 +45,7 @@ function rowsToTree(rows: TraceNode[]): TraceNode {
   return tree;
 }
 
-const durationRegex = /(?:(\d*)h)?(?:(\d*)m)?(?:(\d*)s)?(?:(\d*)ms)?(?:(\d*)μs)?(?:(\d*)ns)?/;
+const durationRegex = /(?:(\d*)s)?(?:(\d*)ms)?(?:(\d*)μs)?(?:(\d*)ns)?/;
 
 // returns nanoseconds
 function parseDuration(dur: string): number {
@@ -53,17 +53,17 @@ function parseDuration(dur: string): number {
   if (!matches) {
     return 0; // have to null check to make TS happy in this configration...
   }
-  const hours = matches[1] ? parseInt(matches[1]) : 0;
-  const minutes = 60 * hours + (matches[2] ? parseInt(matches[2]) : 0);
-  const seconds = 60 * minutes + (matches[3] ? parseInt(matches[3]) : 0);
-  const milliseconds = 1000 * seconds + (matches[4] ? parseInt(matches[4]) : 0);
-  const microseconds = 1000 * milliseconds + (matches[5] ? parseInt(matches[5]) : 0);
-  const nanoseconds = 1000 * microseconds + (matches[6] ? parseInt(matches[6]) : 0);
+  const seconds = (matches[1] ? parseInt(matches[1]) : 0);
+  const milliseconds = 1000 * seconds + (matches[2] ? parseInt(matches[2]) : 0);
+  const microseconds = 1000 * milliseconds + (matches[3] ? parseInt(matches[3]) : 0);
+  const nanoseconds = 1000 * microseconds + (matches[4] ? parseInt(matches[4]) : 0);
   return nanoseconds;
 }
 
 function parseRow(columns: string[]): TraceNode {
-  if (columns.length !== EXPECTED_HEADING.length) {}
+  if (columns.length !== EXPECTED_HEADING.length) {
+    throw new Error(`expected ${EXPECTED_HEADING.length} columns; got ${columns.length}: ${columns}`)
+  }
   return {
     spanID: parseInt(columns[0]),
     timestamp: DateTime.fromSQL(columns[2], { zone: 'utc' }),
