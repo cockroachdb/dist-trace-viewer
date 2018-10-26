@@ -4,6 +4,7 @@ import { createSelector } from 'reselect';
 import TraceView, { update, initialState, TraceViewState, Action } from "./TraceView";
 import { visitNodes } from "./tree";
 import { TraceNode } from './trace';
+import { formatNanos } from "./format";
 
 function indexById(trace: TraceNode) {
   const output: { [id: string]: TraceNode } = {};
@@ -57,7 +58,7 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
             </tr>
             <tr>
               <th>Duration:</th>
-              <td>{span.duration}</td>
+              <td>{formatNanos(span.duration)}</td>
             </tr>
           </tbody>
         </table>
@@ -72,7 +73,7 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
           <tbody>
             {span.messages.map((message) => (
               <tr key={message.age}>
-                <td>{message.age}</td>
+                <td>{formatNanos(message.age)}</td>
                 <td style={{ fontFamily: "monospace" }}>{message.message}</td>
               </tr>
             ))}

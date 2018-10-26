@@ -2,6 +2,8 @@ import _ from "lodash";
 import React, { Component } from "react";
 import { numDescendants } from "./tree";
 import { TraceNode } from "./trace";
+import { formatNanos } from "./format";
+import * as d3scale from "d3-scale";
 
 const HEIGHT = 30;
 const HEIGHT_PLUS_SPACE = HEIGHT + 5;
@@ -91,11 +93,8 @@ function flatten(tree: TraceNode, collapsed: number[]) {
   return output;
 }
 
-function lerp(omin: number, omax: number, imin: number, imax: number): (val: number) => number {
-  return (input: number): number => {
-    return omin + (omax - omin) * (input - imin) / (imax - imin);
-  }
-}
+const MICROSECOND = 1000;
+const MILLISECOND = 1000 * MICROSECOND;
 
 class TraceView extends Component<TraceViewProps> {
 
@@ -115,40 +114,46 @@ class TraceView extends Component<TraceViewProps> {
     } = traceState;
     const flattened = flatten(trace, collapsedSpanIDs);
     // TODO(vilterp): convert to age
-    const lastTS = _.max(flattened.map((span) => (span.timestamp.toMillis() + span.duration)));
-    const scale = lerp(0, width, 0, lastTS);
+    const firstTS = trace.timestamp.toMillis();
+    const lastTS = _.max(flattened.map((span) => (span.timestamp.toMillis() + (span.duration/MILLISECOND))));
+
+    const scale = d3scale
+      .scaleLinear()
+      .domain([firstTS, lastTS])
+      .range([0, width]);
 
     return (
       <svg width={width} height="2000" style={{ border: "1px solid black" }}>
         {flattened.map((span, idx) => {
           const isHovered = hoveredSpanID === span.spanID;
           const isCollapsed = _.includes(collapsedSpanIDs, span.spanID);
-          const timeLabel = `${span.duration}ns`;
+          const timeLabel = `${formatNanos(span.duration)} (${span.duration}ns)`;
           const isLeaf = !!span.children;
           const label = !isLeaf
             ? `${timeLabel} : ${span.operation}`
             : isCollapsed
               ? `${SIDE_ARROW} ${timeLabel} : ${span.operation} (${numDescendants(span)})`
               : `${DOWN_ARROW} ${timeLabel} : ${span.operation}`;
+          const startTS = span.timestamp.toMillis();
+          const endTS = span.timestamp.toMillis() + span.duration / MILLISECOND;
           return (
             <g
               key={span.spanID}
               style={{ cursor: "pointer" }}
               onMouseOver={() => { this.handleAction(hoverSpan(span.spanID)); }}
-              // onMouseOut={() => { this.handleAction(unHoverSpan); }}
               onClick={() => { this.handleAction(toggleCollapsed(span.spanID)); }}
             >
               <rect
-                fill={isHovered ? "blue" : "lightblue"}
+                fill="lightblue"
                 y={idx * HEIGHT_PLUS_SPACE - 5}
-                x={scale(span.timestamp.toMillis())}
+                x={scale(startTS) + 5}
                 height={HEIGHT}
-                width={scale(span.duration)}
+                width={scale(endTS) - scale(startTS)}
               />
               <text
-                x={scale(span.timestamp.toMillis()) + 5}
+                x={scale(startTS) + 5}
                 y={idx * HEIGHT_PLUS_SPACE + HEIGHT/2}
-                fill={isHovered ? "white" : "black"}
+                style={{ textDecoration: isHovered ? "underline" : "none" }}
               >
                 {label}
               </text>
