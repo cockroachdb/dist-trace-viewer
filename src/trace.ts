@@ -97,7 +97,7 @@ function compressRows(originalRows: TraceNode[]): TraceNode[] {
 }
 
 export function parseCSV(csvText: string): TraceNode {
-  const parseRes = Papa.parse(csvText);
+  const parseRes = Papa.parse(csvText.trim());
   if (parseRes.errors.length > 0) {
     throw new Error(`parse errors: ${parseRes.errors.join(", ")}`);
   }
