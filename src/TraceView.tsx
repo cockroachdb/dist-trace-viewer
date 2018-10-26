@@ -10,13 +10,13 @@ const DOWN_ARROW = '▼';
 const SIDE_ARROW = '▶';
 
 const TOGGLE_COLLAPSED = 'TOGGLE_COLLAPSED';
-const toggleCollapsed = (spanID) => ({
+const toggleCollapsed = (spanID: number) => ({
   type: TOGGLE_COLLAPSED,
   spanID,
 });
 
 const HOVER_SPAN = 'HOVER_SPAN';
-const hoverSpan = (spanID) => ({
+const hoverSpan = (spanID: number) => ({
   type: HOVER_SPAN,
   spanID,
 });
@@ -43,7 +43,7 @@ export const initialState: TraceViewState = {
   collapsedSpanIDs: [],
 };
 
-interface Action {
+export interface Action {
   type: string;
   spanID?: number;
 }
@@ -51,7 +51,7 @@ interface Action {
 export function update(state: TraceViewState, action: Action): TraceViewState {
   switch (action.type) {
     case TOGGLE_COLLAPSED: {
-      const isCollapsed = state.collapsedSpanIDs.includes(action.spanID);
+      const isCollapsed = _.includes(state.collapsedSpanIDs, action.spanID);
       return {
         ...state,
         collapsedSpanIDs: isCollapsed
@@ -74,11 +74,11 @@ export function update(state: TraceViewState, action: Action): TraceViewState {
   }
 }
 
-function flatten(tree, collapsed) {
-  const output = [];
-  function recur(node) {
+function flatten(tree: TraceNode, collapsed: number[]) {
+  const output: TraceNode[] = [];
+  function recur(node: TraceNode) {
     output.push(node);
-    if (collapsed.includes(node.id)) {
+    if (_.includes(collapsed, node.spanID)) {
       return;
     }
     if (node.children) {
@@ -99,7 +99,7 @@ function lerp(omin: number, omax: number, imin: number, imax: number): (val: num
 
 class TraceView extends Component<TraceViewProps> {
 
-  handleAction = (action) => {
+  handleAction = (action: Action) => {
     this.props.handleAction(action);
   }
 
@@ -114,39 +114,39 @@ class TraceView extends Component<TraceViewProps> {
       hoveredSpanID,
     } = traceState;
     const flattened = flatten(trace, collapsedSpanIDs);
-    // TODO: don't compute this every frame
-    const lastTS = _.max(flattened.map((span) => (span.startTS + span.duration)));
+    // TODO(vilterp): convert to age
+    const lastTS = _.max(flattened.map((span) => (span.timestamp.toMillis() + span.duration)));
     const scale = lerp(0, width, 0, lastTS);
 
     return (
       <svg width={width} height="2000" style={{ border: "1px solid black" }}>
         {flattened.map((span, idx) => {
-          const isHovered = hoveredSpanID === span.id;
-          const isCollapsed = collapsedSpanIDs.includes(span.id);
+          const isHovered = hoveredSpanID === span.spanID;
+          const isCollapsed = _.includes(collapsedSpanIDs, span.spanID);
           const timeLabel = `${span.duration}ms`;
           const isLeaf = !!span.children;
           const label = !isLeaf
-            ? `${timeLabel} : ${span.name}`
+            ? `${timeLabel} : ${span.operation}`
             : isCollapsed
-              ? `${SIDE_ARROW} ${timeLabel} : ${span.name} (${numDescendants(span)})`
-              : `${DOWN_ARROW} ${timeLabel} : ${span.name}`;
+              ? `${SIDE_ARROW} ${timeLabel} : ${span.operation} (${numDescendants(span)})`
+              : `${DOWN_ARROW} ${timeLabel} : ${span.operation}`;
           return (
             <g
-              key={span.id}
+              key={span.spanID}
               style={{ cursor: "pointer" }}
-              onMouseOver={() => { this.handleAction(hoverSpan(span.id)); }}
+              onMouseOver={() => { this.handleAction(hoverSpan(span.spanID)); }}
               // onMouseOut={() => { this.handleAction(unHoverSpan); }}
-              onClick={() => { this.handleAction(toggleCollapsed(span.id)); }}
+              onClick={() => { this.handleAction(toggleCollapsed(span.spanID)); }}
             >
               <rect
                 fill={isHovered ? "blue" : "lightblue"}
                 y={idx * HEIGHT_PLUS_SPACE - 5}
-                x={scale(span.startTS)}
+                x={scale(span.timestamp.toMillis())}
                 height={HEIGHT}
                 width={scale(span.duration)}
               />
               <text
-                x={scale(span.startTS) + 5}
+                x={scale(span.timestamp.toMillis()) + 5}
                 y={idx * HEIGHT_PLUS_SPACE + HEIGHT/2}
                 fill={isHovered ? "white" : "black"}
               >

@@ -1,19 +1,19 @@
 import React, { Component } from 'react';
 import { createSelector } from 'reselect';
 
-import TraceView, { update, initialState, TraceViewState } from "./TraceView";
+import TraceView, { update, initialState, TraceViewState, Action } from "./TraceView";
 import { visitNodes } from "./tree";
 import { TraceNode } from './trace';
 
-function indexById(trace) {
-  const output = {};
-  visitNodes(trace, (node) => {
-    output[node.id] = node;
+function indexById(trace: TraceNode) {
+  const output: { [id: string]: TraceNode } = {};
+  visitNodes(trace, (node: TraceNode) => {
+    output[node.spanID] = node;
   });
   return output;
 }
 
-const indexByIdSelector = createSelector(t => t, indexById);
+const indexByIdSelector = createSelector((t: TraceNode) => t, indexById);
 
 interface TraceAndSidebarProps {
   trace: TraceNode;
@@ -32,13 +32,13 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
     };
   }
 
-  onAction = (action) => {
+  onAction = (action: Action) => {
     this.setState({
       traceState: update(this.state.traceState, action),
     });
   }
 
-  renderSidebar(span) {
+  renderSidebar(span: TraceNode) {
     if (!span) {
       return null;
     }
@@ -48,20 +48,16 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
         <table>
           <tbody style={{ textAlign: "left" }}>
             <tr>
-              <th>Name:</th>
-              <td>{span.name}</td>
+              <th>Operation:</th>
+              <td>{span.operation}</td>
             </tr>
             <tr>
               <th>Start:</th>
-              <td>{span.startTS}</td>
+              <td>{span.timestamp.toString()}</td>
             </tr>
             <tr>
               <th>Duration:</th>
               <td>{span.duration}</td>
-            </tr>
-            <tr>
-              <th>Props:</th>
-              <td>{JSON.stringify(span.props)}</td>
             </tr>
           </tbody>
         </table>
@@ -74,7 +70,7 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
             </tr>
           </thead>
           <tbody>
-            {span.logMessages.map((message) => (
+            {span.messages.map((message) => (
               <tr key={message.age}>
                 <td>{message.age}</td>
                 <td style={{ fontFamily: "monospace" }}>{message.message}</td>
