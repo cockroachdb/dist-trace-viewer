@@ -70,7 +70,7 @@ class App extends React.Component<{}, AppState> {
           <button onClick={this.handleSubmit} className="btn btn-primary">Visualize</button>
           <br />
           {this.state.parseError
-            ? <pre style={{ whiteSpace: "pre-wrap" }}>Parse error: {this.state.parseError.message}</pre>
+            ? <pre style={{ whiteSpace: "pre-wrap", color: "red" }}>Parse error: {this.state.parseError.message}</pre>
             : null}
           <br />
           <button onClick={this.handleExample} className="btn btn-secondary">Example</button>

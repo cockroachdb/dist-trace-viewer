@@ -48,7 +48,8 @@ function rowsToTree(rows: TraceNode[]): TraceNode {
 const durationRegex = /(?:(\d*)s)?(?:(\d*)ms)?(?:(\d*)μs)?(?:(\d*)ns)?/;
 
 // returns nanoseconds
-function parseDuration(dur: string): number {
+function parseDuration(unsanitizedDur: string): number {
+  const dur = unsanitizedDur.replace("\\302\\265", "μ");
   const matches = dur.match(durationRegex);
   if (!matches) {
     return 0; // have to null check to make TS happy in this configration...
@@ -96,7 +97,7 @@ function compressRows(originalRows: TraceNode[]): TraceNode[] {
 }
 
 export function parseCSV(csvText: string): TraceNode {
-  const parseRes = Papa.parse(csvText);
+  const parseRes = Papa.parse(csvText.trim());
   if (parseRes.errors.length > 0) {
     throw new Error(`parse errors: ${parseRes.errors.join(", ")}`);
   }
