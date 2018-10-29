@@ -29,6 +29,17 @@ function rowsToTree(rows: TraceNode[]): TraceNode {
     if (row.spanID == cur.spanID) {
       cur.messages.push(...row.messages);
     } else if (row.spanID > cur.spanID) {
+      // Normally, this span should be a child of the cur span, but there are
+      // cases in which this new span was actually created on a higher span so
+      // if needed, we walk back up the tree until we find a suitable home for
+      // this new span based on age. This only occurs if a new span is created
+      // from a parent span, but the parent didn't leave a message in the span
+      // between children.
+      const rowFirstMessage = _.first(row.messages)
+      while ((rowFirstMessage.age < _.last(cur.messages).age) && (stack.length > 1)) {
+        stack.pop();
+        cur = _.last(stack);
+      }
       cur.children.push(row);
       stack.push(row);
     } else {
@@ -46,7 +57,7 @@ const durationRegex = /(?:(\d*)s)?(?:(\d*)ms)?(?:(\d*)μs)?(?:(\d*)ns)?/;
 
 // returns nanoseconds
 function parseDuration(unsanitizedDur: string): number {
-  const dur = unsanitizedDur.replace("\\302\\265", "μ");
+  const dur = unsanitizedDur.replace("\\\\", "\\").replace("\\302\\265", "μ");
   const matches = dur.match(durationRegex);
   if (!matches) {
     return 0; // have to null check to make TS happy in this configuration...
