@@ -62,13 +62,13 @@ class App extends React.Component<{}, AppState> {
           <textarea
             value={this.state.traceText}
             onChange={this.handleChangeTraceText}
-            style={{ fontFamily: "monospace" }}
+            style={{ fontFamily: "monospace", whiteSpace: "nowrap" }}
             cols={80}
             rows={30}
             spellCheck={false}
           />
           <br />
-          <button onClick={this.handleSubmit} className="btn btn-primary">Visualize</button>
+          <button onClick={this.handleSubmit} role="submit" className="btn btn-primary">Visualize</button>
           <br />
           {this.state.parseError
             ? <pre style={{ whiteSpace: "pre-wrap", color: "red" }}>Parse error: {this.state.parseError.message}</pre>
