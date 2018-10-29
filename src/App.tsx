@@ -89,10 +89,7 @@ class App extends React.Component<{}, AppState> {
     }
 
     return (
-      <div style={{ padding: 10 }}>
-        <button onClick={this.handleClearTrace} className="btn btn-secondary btn-sm">Clear Trace</button>
-        <TraceAndSidebar trace={this.state.trace} />
-      </div>
+      <TraceAndSidebar trace={this.state.trace} onClear={this.handleClearTrace} />
     );
   }
 }

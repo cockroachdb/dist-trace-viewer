@@ -124,9 +124,8 @@ class TraceView extends Component<TraceViewProps> {
 
     return (
       <svg
-        width={width}
         height={flattened.length * HEIGHT_PLUS_SPACE}
-        style={{ border: "1px solid black" }}
+        style={{ width: "100%", minWidth: width }}
       >
         {flattened.map((span, idx) => {
           const isHovered = hoveredSpanID === span.spanID;

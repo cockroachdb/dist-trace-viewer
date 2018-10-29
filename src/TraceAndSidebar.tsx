@@ -5,6 +5,7 @@ import TraceView, { update, initialState, TraceViewState, Action } from "./Trace
 import { visitNodes } from "./tree";
 import { TraceNode } from './trace';
 import { formatNanos } from "./format";
+import PanelLayout from './PanelLayout';
 
 function indexById(trace: TraceNode) {
   const output: { [id: string]: TraceNode } = {};
@@ -18,6 +19,7 @@ const indexByIdSelector = createSelector((t: TraceNode) => t, indexById);
 
 interface TraceAndSidebarProps {
   trace: TraceNode;
+  onClear: () => void;
 }
 
 interface TraceAndSidebarState {
@@ -87,19 +89,27 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
     const spansByID = indexByIdSelector(this.props.trace)
 
     return (
-      <div style={{ display: "flex" }}>
-        <div>
+      <PanelLayout
+        mainContent={
           <TraceView
             trace={this.props.trace}
             traceState={this.state.traceState}
             width={800}
             handleAction={(action) => this.onAction(action)}
           />
-        </div>
-        <div>
-          {this.renderSidebar(spansByID[this.state.traceState.hoveredSpanID])}
-        </div>
-      </div>
+        }
+        sidebar={
+          this.renderSidebar(spansByID[this.state.traceState.hoveredSpanID])
+        }
+        titleArea={
+          <React.Fragment>
+            <span style={{ paddingRight: 5 }}>
+              Trace: {this.props.trace.timestamp.toString()}
+            </span>
+            <button onClick={this.props.onClear} className="btn btn-secondary btn-sm">Clear</button>
+          </React.Fragment>
+        }
+      />
     );
   }
 }
