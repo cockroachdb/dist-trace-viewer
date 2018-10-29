@@ -19,19 +19,16 @@ export interface TraceNode {
   children: TraceNode[];
 }
 
-const SPAN_START = "=== SPAN START: ";
-const SPAN_END = " ===";
 const EXPECTED_HEADING = ["span_idx", "message_idx", "timestamp", "duration", "operation", "loc", "tag", "message", "age"];
-const SPAN_IDX_COL = 0;
-const AGE_COL = 8;
-const MESSAGE_COL = 7;
 
 function rowsToTree(rows: TraceNode[]): TraceNode {
   const tree = rows[0];
   let stack = [rows[0]];
   rows.slice(1).forEach(row => {
     let cur = _.last(stack);
-    if (row.spanID > cur.spanID) {
+    if (row.spanID == cur.spanID) {
+      cur.messages.push(...row.messages);
+    } else if (row.spanID > cur.spanID) {
       cur.children.push(row);
       stack.push(row);
     } else {
@@ -52,7 +49,7 @@ function parseDuration(unsanitizedDur: string): number {
   const dur = unsanitizedDur.replace("\\302\\265", "μ");
   const matches = dur.match(durationRegex);
   if (!matches) {
-    return 0; // have to null check to make TS happy in this configration...
+    return 0; // have to null check to make TS happy in this configuration...
   }
   const seconds = (matches[1] ? parseInt(matches[1]) : 0);
   const milliseconds = 1000 * seconds + (matches[2] ? parseInt(matches[2]) : 0);
@@ -83,19 +80,6 @@ function parseRow(columns: string[]): TraceNode {
   }
 }
 
-function compressRows(originalRows: TraceNode[]): TraceNode[] {
-  let updatedRows = [originalRows[0]]
-  originalRows.slice(1).forEach(row => {
-    const last = _.last(updatedRows)
-    if (row.spanID === last.spanID) {
-      last.messages.push(...row.messages);
-    } else {
-      updatedRows.push(row);
-    }
-  });
-  return updatedRows;
-}
-
 export function parseCSV(csvText: string): TraceNode {
   const parseRes = Papa.parse(csvText.trim());
   if (parseRes.errors.length > 0) {
@@ -111,8 +95,5 @@ export function parseCSV(csvText: string): TraceNode {
   }
 
   const parsedRows = _.map(rows.slice(1), row => parseRow(row));
-  const compRows = compressRows(parsedRows);
-  const tree = rowsToTree(compRows);
-
-  return tree;
+  return rowsToTree(parsedRows);
 }
