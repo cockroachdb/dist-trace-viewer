@@ -76,7 +76,7 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
             {span.messages.map((message) => (
               <tr key={message.age}>
                 <td>{formatNanos(message.age)}</td>
-                <td style={{ fontFamily: "monospace" }}>{message.message}</td>
+                <td style={{ fontFamily: "monospace", whiteSpace: "pre" }}>{message.message}</td>
               </tr>
             ))}
           </tbody>
