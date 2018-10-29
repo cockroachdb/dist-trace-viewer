@@ -150,9 +150,9 @@ class TraceView extends Component<TraceViewProps> {
               <rect
                 fill="lightblue"
                 y={idx * HEIGHT_PLUS_SPACE - 5}
-                x={scale(startTS) + 5}
+                x={scale(startTS)}
                 height={HEIGHT}
-                width={scale(endTS) - scale(startTS)}
+                width={Math.max(scale(endTS) - scale(startTS), 1)}
               />
               <text
                 x={scale(startTS) + 5}
@@ -161,6 +161,18 @@ class TraceView extends Component<TraceViewProps> {
               >
                 {label}
               </text>
+              <g>
+                {span.messages.map((logEntry, logIdx) => (
+                  <circle
+                    key={logIdx}
+                    cx={scale(logEntry.age / MILLISECOND + firstTS)}
+                    cy={idx * HEIGHT_PLUS_SPACE + 20}
+                    r={3}
+                    fill={"white"}
+                    stroke={"black"}
+                  />
+                ))}
+              </g>
             </g>
           );
         })}
