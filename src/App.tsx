@@ -81,7 +81,7 @@ class App extends React.Component<{}, AppState> {
             SET tracing = on;<br />
             ...your statement here...;<br />
             SET tracing = off;<br />
-            \set display_format = csv;<br />
+            \set display_format csv;<br />
             SELECT * FROM crdb_internal.session_trace;
           </pre>
         </div>
