@@ -30,6 +30,7 @@ class App extends React.Component<{}, AppState> {
   handleSubmit = () => {
     try {
       const trace = parseCSV(this.state.traceText);
+      console.log("trace:", trace);
       this.setState({
         trace,
       });
