@@ -62,7 +62,7 @@ class App extends React.Component<{}, AppState> {
           <textarea
             value={this.state.traceText}
             onChange={this.handleChangeTraceText}
-            style={{ fontFamily: "monospace", whiteSpace: "nowrap" }}
+            style={{ fontFamily: "monospace", whiteSpace: "pre" }}
             cols={80}
             rows={30}
             spellCheck={false}
