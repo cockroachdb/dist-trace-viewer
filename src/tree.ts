@@ -17,5 +17,5 @@ export function numDescendants(tree: TraceNode) {
   visitNodes(tree, () => {
     num++;
   });
-  return num;
+  return num - 1;
 }

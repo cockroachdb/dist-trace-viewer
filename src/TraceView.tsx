@@ -124,16 +124,15 @@ class TraceView extends Component<TraceViewProps> {
 
     return (
       <svg
-        width={width}
         height={flattened.length * HEIGHT_PLUS_SPACE}
-        style={{ border: "1px solid black" }}
+        style={{ width: "100%", minWidth: width }}
       >
         {flattened.map((span, idx) => {
           const isHovered = hoveredSpanID === span.spanID;
           const isCollapsed = _.includes(collapsedSpanIDs, span.spanID);
           const timeLabel = `${formatNanos(span.duration)} (${span.duration}ns)`;
-          const isLeaf = !!span.children;
-          const label = !isLeaf
+          const isLeaf = span.children.length === 0;
+          const label = isLeaf
             ? `${timeLabel} : ${span.operation}`
             : isCollapsed
               ? `${SIDE_ARROW} ${timeLabel} : ${span.operation} (${numDescendants(span)})`
@@ -145,8 +144,15 @@ class TraceView extends Component<TraceViewProps> {
               key={span.spanID}
               style={{ cursor: "pointer" }}
               onMouseOver={() => { this.handleAction(hoverSpan(span.spanID)); }}
-              onClick={() => { this.handleAction(toggleCollapsed(span.spanID)); }}
+              onClick={isLeaf ? null : () => { this.handleAction(toggleCollapsed(span.spanID)); }}
             >
+              <rect
+                fill="white"
+                x={0}
+                y={idx * HEIGHT_PLUS_SPACE - 5}
+                height={HEIGHT}
+                width={width}
+              />
               <rect
                 fill="lightblue"
                 y={idx * HEIGHT_PLUS_SPACE - 5}
