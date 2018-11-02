@@ -7,7 +7,7 @@ import { parseCSV, TraceNode } from "./trace";
 import { QueryPlanGraph } from "./planView/QueryPlanGraph";
 
 import { decode } from "./planView/decode";
-import exampleQueryPlan from "./planView/example";
+import exampleQueryPlans from "./planView/examples";
 
 interface AppState {
   parseError: Error | null;
@@ -65,7 +65,7 @@ class App extends React.Component<{}, AppState> {
 
           <div style={{ width: 500, height: 500, border: "solid black 1px" }}>
             <QueryPlanGraph
-              plan={decode(exampleQueryPlan)}
+              plan={decode(exampleQueryPlans[2])}
             />
           </div>
 
