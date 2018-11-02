@@ -4,6 +4,10 @@ import TraceAndSidebar from "./TraceAndSidebar";
 import "./trace";
 import exampleTraceCSV from "./exampleTraceCSV";
 import { parseCSV, TraceNode } from "./trace";
+import { QueryPlanGraph } from "./planView/QueryPlanGraph";
+
+import { decode } from "./planView/decode";
+import exampleQueryPlan from "./planView/example";
 
 interface AppState {
   parseError: Error | null;
@@ -58,6 +62,13 @@ class App extends React.Component<{}, AppState> {
     if (this.state.trace === null) {
       return (
         <div style={{ paddingLeft: 50, paddingTop: 10 }}>
+
+          <div style={{ width: 500, height: 500, border: "solid black 1px" }}>
+            <QueryPlanGraph
+              plan={decode(exampleQueryPlan)}
+            />
+          </div>
+
           <h1>Paste A Trace as CSV</h1>
           <textarea
             value={this.state.traceText}
