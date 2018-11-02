@@ -8,6 +8,7 @@ import {
 } from "./model";
 
 import * as cola from "webcola";
+import "./queryPlanGraph.css";
 
 interface QueryPlanGraphProps {
   plan: QueryPlan;
@@ -22,7 +23,7 @@ export class QueryPlanGraph extends React.Component<QueryPlanGraphProps> {
   zoomRect: d3.Selection<SVGElement>;
 
   onResize = () => {
-    this.redrawPlan(this.props.plan);
+    this.redrawPlan();
   }
 
   constructor(props: QueryPlanGraphProps) {
@@ -31,6 +32,7 @@ export class QueryPlanGraph extends React.Component<QueryPlanGraphProps> {
 
   componentDidMount () {
     this.setupPlan();
+    this.redrawPlan();
     window.addEventListener("resize", this.onResize);
   }
 
@@ -40,7 +42,7 @@ export class QueryPlanGraph extends React.Component<QueryPlanGraphProps> {
 
   componentWillReceiveProps(nextProps: QueryPlanGraphProps) {
     if (nextProps.plan !== this.props.plan) {
-      this.redrawPlan(nextProps.plan);
+      this.redrawPlan();
     }
   }
 
@@ -66,7 +68,9 @@ export class QueryPlanGraph extends React.Component<QueryPlanGraphProps> {
       .call(zoom.event);
   }
 
-  redrawPlan(plan: QueryPlan) {
+  redrawPlan() {
+    console.log("redrawPlan");
+    const plan = this.props.plan;
     this.vis.selectAll("*").remove();
 
     const containerWidth = this.svg.node().parentElement.clientWidth;
@@ -180,7 +184,12 @@ export class QueryPlanGraph extends React.Component<QueryPlanGraphProps> {
       .attr("font-size", "15")
       .text(d => "Node " + d.nodeID);
 
+    let ticks = 0;
     d3cola.on("tick", function () {
+      ticks++;
+      if (ticks > 100) {
+        return;
+      }
       node.each(function (d) {
         d.innerBounds = d.bounds.inflate(- margin);
       });
@@ -223,7 +232,7 @@ export class QueryPlanGraph extends React.Component<QueryPlanGraphProps> {
   }
 
   render() {
-    return <svg ref={(svg) => this.svg = d3.select(svg)} />;
+    return <svg className="query-plan-graph" ref={(svg) => this.svg = d3.select(svg)} />;
   }
 }
 
