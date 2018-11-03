@@ -5,7 +5,8 @@ import TraceView, { update, initialState, TraceViewState, Action } from "./Trace
 import { visitNodes } from "./tree";
 import { TraceNode } from './trace';
 import { formatNanos } from "./format";
-import PanelLayout from './PanelLayout';
+import { QueryPlan } from './planView/model';
+import { QueryPlanGraph } from './planView/QueryPlanGraph';
 
 function indexById(trace: TraceNode) {
   const output: { [id: string]: TraceNode } = {};
@@ -19,6 +20,7 @@ const indexByIdSelector = createSelector((t: TraceNode) => t, indexById);
 
 interface TraceAndSidebarProps {
   trace: TraceNode;
+  plan: QueryPlan;
   onClear: () => void;
 }
 
@@ -93,19 +95,8 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
     const spansByID = indexByIdSelector(this.props.trace)
 
     return (
-      <PanelLayout
-        mainContent={
-          <TraceView
-            trace={this.props.trace}
-            traceState={this.state.traceState}
-            width={800}
-            handleAction={(action) => this.onAction(action)}
-          />
-        }
-        sidebar={
-          this.renderSidebar(spansByID[this.state.traceState.hoveredSpanID])
-        }
-        titleArea={
+      <Layout
+        title={
           <React.Fragment>
             <span style={{ paddingRight: 5 }}>
               Trace: {this.props.trace.timestamp.toString()}
@@ -113,9 +104,74 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
             <button onClick={this.props.onClear} className="btn btn-secondary btn-sm">Clear</button>
           </React.Fragment>
         }
+        left={
+          this.renderSidebar(spansByID[this.state.traceState.hoveredSpanID])
+        }
+        middle={
+          <TraceView
+            trace={this.props.trace}
+            traceState={this.state.traceState}
+            width={800}
+            handleAction={(action) => this.onAction(action)}
+          />
+        }
+        right={
+          <QueryPlanGraph plan={this.props.plan} />
+        }
       />
     );
   }
+}
+
+function Layout(props: {
+  title: React.ReactNode,
+  left: React.ReactNode,
+  middle: React.ReactNode,
+  right: React.ReactNode,
+}): JSX.Element {
+  return (
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: "30% auto 30%",
+      gridTemplateRows: "40px auto",
+      height: "100vh",
+    }}>
+      <div style={{
+        gridRow: 1,
+        gridColumnStart: 1,
+        gridColumnEnd: 4,
+        padding: 5,
+        backgroundColor: "#dddddd",
+        borderBottom: "1px solid #c0c0c0",
+      }}>
+        {props.title}
+      </div>
+      <div style={{
+        gridRow: 2,
+        gridColumn: 1,
+        overflow: "scroll",
+        borderRight: "1px solid lightgrey",
+        backgroundColor: "#f0f0f0",
+      }}>
+        {props.left}
+      </div>
+      <div style={{
+        gridRow: 2,
+        gridColumn: 2,
+        overflow: "scroll",
+      }}>
+        {props.middle}
+      </div>
+      <div style={{
+        gridRow: 2,
+        gridColumn: 3,
+        borderLeft: "solid 1px lightgrey",
+        backgroundColor: "#f0f0f0",
+      }}>
+        {props.right}
+      </div>
+    </div>
+  );
 }
 
 export default TraceAndSidebar;
