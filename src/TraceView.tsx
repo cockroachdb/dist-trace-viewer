@@ -142,7 +142,7 @@ class TraceView extends Component<TraceViewProps> {
           return (
             <g
               key={span.spanID}
-              style={{ cursor: "pointer" }}
+              style={{ cursor: isLeaf ? "default" : "pointer" }}
               onMouseOver={() => { this.handleAction(hoverSpan(span.spanID)); }}
               onClick={isLeaf ? null : () => { this.handleAction(toggleCollapsed(span.spanID)); }}
             >
