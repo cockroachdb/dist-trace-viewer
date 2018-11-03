@@ -1,9 +1,16 @@
 import React, { Component } from 'react';
 import { createSelector } from 'reselect';
 
-import TraceView, { update, initialState, TraceViewState, Action } from "./TraceView";
+import TraceView, {
+  HOVER_SPAN,
+  HOVER_PROCESSOR,
+  update,
+  initialState,
+  TraceViewState,
+  Action,
+} from "./TraceView";
 import { visitNodes } from "./tree";
-import { TraceNode } from './trace';
+import { TraceNode, processorIDForSpanID, getSpanIDForProcessorID } from './trace';
 import { formatNanos } from "./format";
 import { QueryPlan } from './planView/model';
 import { QueryPlanGraph } from './planView/QueryPlanGraph';
@@ -42,19 +49,31 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
   }
 
   onAction = (action: Action) => {
+    const traceState = update(this.state.traceState, action);
+    switch (action.type) {
+      case HOVER_SPAN: {
+        const processorID = processorIDForSpanID(this.props.trace, action.spanID);
+        if (processorID !== null) {
+          this.setState({
+            hoveredProcessorID: processorID,
+          });
+        }
+        break;
+      }
+      case HOVER_PROCESSOR:
+        const spanID = getSpanIDForProcessorID(this.props.trace, action.processorID);
+        traceState.hoveredSpanID = spanID;
+        break;
+    }
     this.setState({
-      traceState: update(this.state.traceState, action),
-      hoveredProcessorID: null,
+      traceState,
     });
   }
 
   handleHoverProcessor = (processorID: number) => {
-    this.setState({
-      hoveredProcessorID: processorID,
-      traceState: {
-        ...this.state.traceState,
-        hoveredProcessorID: processorID,
-      },
+    this.onAction({
+      type: HOVER_PROCESSOR,
+      processorID,
     });
   }
 

@@ -17,13 +17,13 @@ const toggleCollapsed = (spanID: number) => ({
   spanID,
 });
 
-const HOVER_SPAN = 'HOVER_SPAN';
+export const HOVER_SPAN = 'HOVER_SPAN';
 const hoverSpan = (spanID: number) => ({
   type: HOVER_SPAN,
   spanID,
 });
 
-const HOVER_PROCESSOR = 'HOVER_PROCESSOR';
+export const HOVER_PROCESSOR = 'HOVER_PROCESSOR';
 const hoverProcessor = (processorID: number) => ({
   type: HOVER_PROCESSOR,
   processorID,

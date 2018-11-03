@@ -6,5 +6,5 @@ export function formatNanos(nanos: number): string {
   const justMS = Math.round(ms % 1000);
   const sec = ms / 1000;
   const justSec = Math.round(sec % 1000);
-  return `${justSec}s${justMS}ms${justUS}us${justNS}ns`;
+  return `${justSec}s${justMS}ms${justUS}μs${justNS}ns`;
 }
