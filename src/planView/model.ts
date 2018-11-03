@@ -3,6 +3,7 @@ import cola from "webcola";
 // Cola stuff.
 
 export interface QueryNode extends cola.InputNode {
+  id?: number;
   title: string;
   details: string;
   type: string;
@@ -95,6 +96,9 @@ export function buildGraph(data: QueryPlan): DataGraph {
     const p = data.processors[i];
     p.core.graphNodeIdx = graph.nodes.length;
     graph.nodes.push({
+      // TODO(vilterp): this is brittle. Should be serialized on CR
+      // side as a separate property.
+      id: parseInt(p.core.title.split("/")[1]),
       title: p.core.title,
       details: p.core.details,
       width: 60,

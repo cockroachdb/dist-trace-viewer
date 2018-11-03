@@ -23,6 +23,10 @@
   fill: #ffffcc;
 }
 
+.query-plan-graph .core.selected {
+  fill: #d5d5aa;
+}
+
 .query-plan-graph .synchronizer {
   stroke: black;
   stroke-width: 1px;
