@@ -19,6 +19,7 @@ function indexById(trace: TraceNode) {
 const indexByIdSelector = createSelector((t: TraceNode) => t, indexById);
 
 interface TraceAndSidebarProps {
+  query: string,
   trace: TraceNode;
   plan: QueryPlan;
   onClear: () => void;
@@ -95,7 +96,7 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
         title={
           <React.Fragment>
             <span style={{ paddingRight: 5 }}>
-              Trace: {this.props.trace.timestamp.toString()}
+              Query: <code>{this.props.query}</code>
             </span>
             <button onClick={this.props.onClear} className="btn btn-secondary btn-sm">Clear</button>
           </React.Fragment>
