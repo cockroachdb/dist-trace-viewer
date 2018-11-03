@@ -1,7 +1,16 @@
 export default [
   {
     query: "select ol_number, count(*) from tpcc.order_line group by ol_number",
-    explain: "https://cockroachdb.github.io/distsqlplan/decode.html#eJyUkcFKw0AQhu8-hfynFlaapJ5ySvFUKBupLSISwpodQzBmwu4GhJJ3l2QPbYRGPf4z881-zJ7QsCapPskifkUIgQiZQGu4IGvZDGU_tNVfiAOBqmk7N5QzgYINIT7BVa4mxJB8x-0qgoAmp6p6HOsFuHNnyDpVEuJ1Ly4Wh_OLD-qtpj0pTWYVTNaDjSaT11VD-ftHck4QSDsX3yb3uKYQ_kdhU5aGSuXYrMKpQTLkjXzJZXrI5XG3WyThEgIP6VEe8n36_LRYXnWIJg6_3HdPtuXG0p8OHPSZAOmS_B9a7kxBj4aL8Rkf05EbC5qs8921D9vGtwbBSzichaN5OJqFgx9w1t98BwAA__9uWdyJ",
+    explain: `    tree    |    field    |       description
++-----------+-------------+--------------------------+
+  group     |             |
+   │        | aggregate 0 | ol_number
+   │        | aggregate 1 | count_rows()
+   │        | group by    | @1
+   └── scan |             |
+            | table       | order_line@order_line_fk
+            | spans       | ALL`,
+    explainDistSQL: "https://cockroachdb.github.io/distsqlplan/decode.html#eJyUkcFKw0AQhu8-hfynFlaapJ5ySvFUKBupLSISwpodQzBmwu4GhJJ3l2QPbYRGPf4z881-zJ7QsCapPskifkUIgQiZQGu4IGvZDGU_tNVfiAOBqmk7N5QzgYINIT7BVa4mxJB8x-0qgoAmp6p6HOsFuHNnyDpVEuJ1Ly4Wh_OLD-qtpj0pTWYVTNaDjSaT11VD-ftHck4QSDsX3yb3uKYQ_kdhU5aGSuXYrMKpQTLkjXzJZXrI5XG3WyThEgIP6VEe8n36_LRYXnWIJg6_3HdPtuXG0p8OHPSZAOmS_B9a7kxBj4aL8Rkf05EbC5qs8921D9vGtwbBSzichaN5OJqFgx9w1t98BwAA__9uWdyJ",
     trace: `span_idx,message_idx,timestamp,duration,operation,loc,tag,message,age
 0,0,2018-11-03 04:39:47.202507+00:00,343ms171\\302\\265s470ns,session recording,,,=== SPAN START: session recording ===,0s
 0,1,2018-11-03 04:39:47.202706+00:00,343ms171\\302\\265s470ns,session recording,,"[n1,client=127.0.0.1:65187,user=root]","[NoTxn pos:45] executing ExecStmt: SELECT ol_number, count(*) FROM tpcc.order_line GROUP BY ol_number",199\\302\\265s
