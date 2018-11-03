@@ -28,6 +28,7 @@ interface TraceAndSidebarProps {
 
 interface TraceAndSidebarState {
   traceState: TraceViewState;
+  hoveredProcessorID: number | null;
 }
 
 class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarState> {
@@ -36,12 +37,24 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
     super(props);
     this.state = {
       traceState: initialState,
+      hoveredProcessorID: null,
     };
   }
 
   onAction = (action: Action) => {
     this.setState({
       traceState: update(this.state.traceState, action),
+      hoveredProcessorID: null,
+    });
+  }
+
+  handleHoverProcessor = (processorID: number) => {
+    this.setState({
+      hoveredProcessorID: processorID,
+      traceState: {
+        ...this.state.traceState,
+        hoveredProcessorID: processorID,
+      },
     });
   }
 
@@ -107,7 +120,11 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
             <pre style={{ borderBottom: "1px solid lightgrey", margin: 5 }}>
               {this.props.explain}
             </pre>
-            <QueryPlanGraph plan={this.props.plan} />
+            <QueryPlanGraph
+              plan={this.props.plan}
+              hoveredProcessorID={this.state.hoveredProcessorID}
+              onHoverProcessor={this.handleHoverProcessor}
+            />
           </React.Fragment>
         }
         middle={

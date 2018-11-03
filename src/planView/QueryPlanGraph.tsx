@@ -12,6 +12,8 @@ import "./queryPlanGraph.css";
 
 interface QueryPlanGraphProps {
   plan: QueryPlan;
+  hoveredProcessorID: number | null;
+  onHoverProcessor?: (processorID: number) => void;
 }
 
 // QueryPlanGraph creates an SVG schematic from a JSON representation of a
@@ -44,6 +46,9 @@ export class QueryPlanGraph extends React.Component<QueryPlanGraphProps> {
     if (nextProps.plan !== this.props.plan) {
       this.redrawPlan();
     }
+    if (nextProps.hoveredProcessorID !== this.props.hoveredProcessorID) {
+      this.highlightProcessor(nextProps.hoveredProcessorID);
+    }
   }
 
   setupPlan() {
@@ -66,6 +71,12 @@ export class QueryPlanGraph extends React.Component<QueryPlanGraphProps> {
     this.zoomRect
       .call(zoom)
       .call(zoom.event);
+  }
+
+  handleHoverProcessor = (node: QueryNode) => {
+    if (this.props.onHoverProcessor && node.id !== undefined) {
+      this.props.onHoverProcessor(node.id);
+    }
   }
 
   redrawPlan() {
@@ -142,6 +153,7 @@ export class QueryPlanGraph extends React.Component<QueryPlanGraphProps> {
       .attr("height", d => d.height + 2 * pad + 2 * margin)
       .attr("rx", d => d.rx)
       .attr("ry", d => d.rx)
+      .on("mouseover", this.handleHoverProcessor)
       .call(d3cola.drag);
 
     const label = nodesLayer.selectAll(".label")
@@ -231,8 +243,26 @@ export class QueryPlanGraph extends React.Component<QueryPlanGraphProps> {
     });
   }
 
+  highlightProcessor(processorID: number) {
+    const graph = buildGraph(this.props.plan);
+    const nodes = this.svg.selectAll(".core");
+    nodes
+      .data(graph.nodes)
+      .attr(
+        "class",
+        d => {
+          return d.type + (d.id === processorID ? " selected" : "")
+        },
+      );
+  }
+
   render() {
-    return <svg className="query-plan-graph" ref={(svg) => this.svg = d3.select(svg)} />;
+    return (
+      <svg
+        className="query-plan-graph"
+        ref={(svg) => this.svg = d3.select(svg)}
+      />
+    );
   }
 }
 

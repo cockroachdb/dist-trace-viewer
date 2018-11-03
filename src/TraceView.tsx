@@ -23,10 +23,11 @@ const hoverSpan = (spanID: number) => ({
   spanID,
 });
 
-const UN_HOVER_SPAN = 'UN_HOVER_SPAN';
-const unHoverSpan = {
-  type: UN_HOVER_SPAN,
-};
+const HOVER_PROCESSOR = 'HOVER_PROCESSOR';
+const hoverProcessor = (processorID: number) => ({
+  type: HOVER_PROCESSOR,
+  processorID,
+});
 
 interface TraceViewProps {
   trace: TraceNode;
@@ -37,17 +38,20 @@ interface TraceViewProps {
 
 export interface TraceViewState {
   hoveredSpanID: number;
+  hoveredProcessorID: number | null;
   collapsedSpanIDs: number[];
 }
 
 export const initialState: TraceViewState = {
   hoveredSpanID: 0,
+  hoveredProcessorID: null,
   collapsedSpanIDs: [],
 };
 
 export interface Action {
   type: string;
   spanID?: number;
+  processorID?: number;
 }
 
 export function update(state: TraceViewState, action: Action): TraceViewState {
@@ -66,10 +70,10 @@ export function update(state: TraceViewState, action: Action): TraceViewState {
         ...state,
         hoveredSpanID: action.spanID,
       };
-    case UN_HOVER_SPAN:
+    case HOVER_PROCESSOR:
       return {
         ...state,
-        hoveredSpanID: null,
+        hoveredProcessorID: action.processorID,
       };
     default:
       return state;
