@@ -41,7 +41,7 @@ export interface TraceViewState {
 }
 
 export const initialState: TraceViewState = {
-  hoveredSpanID: null,
+  hoveredSpanID: 0,
   collapsedSpanIDs: [],
 };
 

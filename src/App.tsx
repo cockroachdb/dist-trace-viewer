@@ -137,7 +137,11 @@ class App extends React.Component<{}, AppState> {
     }
 
     return (
-      <TraceAndSidebar trace={this.state.trace} onClear={this.handleClearTrace} />
+      <TraceAndSidebar
+        trace={this.state.trace}
+        plan={this.state.queryPlan}
+        onClear={this.handleClearTrace}
+      />
     );
   }
 }
