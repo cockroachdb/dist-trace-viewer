@@ -20,6 +20,7 @@ const indexByIdSelector = createSelector((t: TraceNode) => t, indexById);
 
 interface TraceAndSidebarProps {
   query: string,
+  explain: string,
   trace: TraceNode;
   plan: QueryPlan;
   onClear: () => void;
@@ -100,13 +101,18 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
         title={
           <React.Fragment>
             <span style={{ paddingRight: 5 }}>
-              Query: <code>{this.props.query}</code>
+              <strong>Query:</strong> <code>{this.props.query}</code>
             </span>
             <button onClick={this.props.onClear} className="btn btn-secondary btn-sm">Clear</button>
           </React.Fragment>
         }
         left={
-          this.renderSidebar(spansByID[this.state.traceState.hoveredSpanID])
+          <React.Fragment>
+            <pre style={{ borderBottom: "1px solid lightgrey", margin: 5 }}>
+              {this.props.explain}
+            </pre>
+            <QueryPlanGraph plan={this.props.plan} />
+          </React.Fragment>
         }
         middle={
           <TraceView
@@ -117,7 +123,7 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
           />
         }
         right={
-          <QueryPlanGraph plan={this.props.plan} />
+          this.renderSidebar(spansByID[this.state.traceState.hoveredSpanID])
         }
       />
     );
@@ -168,6 +174,7 @@ function Layout(props: {
         gridColumn: 3,
         borderLeft: "solid 1px lightgrey",
         backgroundColor: "#f0f0f0",
+        overflow: "scroll",
       }}>
         {props.right}
       </div>

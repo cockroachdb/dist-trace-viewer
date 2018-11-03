@@ -10,6 +10,7 @@ import examples from "./examples";
 
 interface AppState {
   queryText: string;
+  explainText: string;
   // Trace stuff.
   traceText: string;
   traceParseError: Error | null;
@@ -25,10 +26,11 @@ class App extends React.Component<{}, AppState> {
     super(props);
     this.state = {
       queryText: examples[0].query,
+      explainText: examples[0].explain,
       traceText: examples[0].trace,
       traceParseError: null,
       trace: null,
-      planURLText: examples[0].explain,
+      planURLText: examples[0].explainDistSQL,
       planParseError: null,
       queryPlan: null,
     };
@@ -49,6 +51,12 @@ class App extends React.Component<{}, AppState> {
   handleChangeQueryText = (evt: React.FormEvent<HTMLTextAreaElement>) => {
     this.setState({
       queryText: evt.currentTarget.value,
+    });
+  }
+
+  handleChangeExplainText = (evt: React.FormEvent<HTMLTextAreaElement>) => {
+    this.setState({
+      explainText: evt.currentTarget.value,
     });
   }
 
@@ -83,10 +91,12 @@ class App extends React.Component<{}, AppState> {
   }
 
   handleExample = () => {
+    const example = examples[0];
     this.setState({
-      queryText: examples[0].query,
-      traceText: examples[0].trace,
-      planURLText: examples[0].explain,
+      queryText: example.query,
+      explainText: example.explain,
+      traceText: example.trace,
+      planURLText: example.explain,
     });
   }
 
@@ -103,9 +113,18 @@ class App extends React.Component<{}, AppState> {
           <h1>Paste A Trace as CSV</h1>
           <textarea
             value={this.state.queryText}
+            placeholder="SQL Query"
             style={{ fontFamily: "monospace", whiteSpace: "pre" }}
             cols={80}
             onChange={this.handleChangeQueryText}
+          />
+          <br />
+          <textarea
+            value={this.state.explainText}
+            onChange={this.handleChangeExplainText}
+            style={{ fontFamily: "monospace", whiteSpace: "pre" }}
+            cols={80}
+            rows={6}
           />
           <br />
           <textarea
@@ -113,7 +132,7 @@ class App extends React.Component<{}, AppState> {
             onChange={this.handleChangeTraceText}
             style={{ fontFamily: "monospace", whiteSpace: "pre" }}
             cols={80}
-            rows={30}
+            rows={20}
             spellCheck={false}
           />
           <br />
@@ -155,6 +174,7 @@ class App extends React.Component<{}, AppState> {
     return (
       <TraceAndSidebar
         query={this.state.queryText}
+        explain={this.state.explainText}
         trace={this.state.trace}
         plan={this.state.queryPlan}
         onClear={this.handleClearTrace}
