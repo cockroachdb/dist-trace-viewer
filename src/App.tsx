@@ -9,6 +9,7 @@ import { QueryPlan } from "./planView/model";
 import examples from "./examples";
 
 interface AppState {
+  queryText: string;
   // Trace stuff.
   traceText: string;
   traceParseError: Error | null;
@@ -23,6 +24,7 @@ class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
     this.state = {
+      queryText: examples[0].query,
       traceText: examples[0].trace,
       traceParseError: null,
       trace: null,
@@ -41,6 +43,12 @@ class App extends React.Component<{}, AppState> {
   handleChangePlanURLText = (evt: React.FormEvent<HTMLTextAreaElement>) => {
     this.setState({
       planURLText: evt.currentTarget.value,
+    });
+  }
+
+  handleChangeQueryText = (evt: React.FormEvent<HTMLTextAreaElement>) => {
+    this.setState({
+      queryText: evt.currentTarget.value,
     });
   }
 
@@ -76,6 +84,7 @@ class App extends React.Component<{}, AppState> {
 
   handleExample = () => {
     this.setState({
+      queryText: examples[0].query,
       traceText: examples[0].trace,
       planURLText: examples[0].explain,
     });
@@ -92,6 +101,13 @@ class App extends React.Component<{}, AppState> {
       return (
         <div style={{ paddingLeft: 50, paddingTop: 10 }}>
           <h1>Paste A Trace as CSV</h1>
+          <textarea
+            value={this.state.queryText}
+            style={{ fontFamily: "monospace", whiteSpace: "pre" }}
+            cols={80}
+            onChange={this.handleChangeQueryText}
+          />
+          <br />
           <textarea
             value={this.state.traceText}
             onChange={this.handleChangeTraceText}
@@ -138,6 +154,7 @@ class App extends React.Component<{}, AppState> {
 
     return (
       <TraceAndSidebar
+        query={this.state.queryText}
         trace={this.state.trace}
         plan={this.state.queryPlan}
         onClear={this.handleClearTrace}
