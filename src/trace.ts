@@ -64,16 +64,16 @@ function setAttrsOnNodes(node: TraceNode) {
 const PROCESSOR_ID_ATTR = "cockroach.processorid";
 
 // TODO: index this, memoize it.
-export function processorIDForSpanID(node: TraceNode, spanID: number): number {
+export function getProcessorIDForSpanID(node: TraceNode, spanID: number): number {
   if (node.spanID === spanID && node.attrs && node.attrs[PROCESSOR_ID_ATTR]) {
     return parseInt(node.attrs[PROCESSOR_ID_ATTR]);
   }
-  node.children.forEach((child) => {
-    const processorID = processorIDForSpanID(child, spanID);
+  for (const child of node.children) {
+    const processorID = getProcessorIDForSpanID(child, spanID);
     if (processorID !== null) {
       return processorID;
     }
-  });
+  };
   return null;
 }
 

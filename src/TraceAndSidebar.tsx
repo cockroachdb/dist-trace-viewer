@@ -10,7 +10,7 @@ import TraceView, {
   Action,
 } from "./TraceView";
 import { visitNodes } from "./tree";
-import { TraceNode, processorIDForSpanID, getSpanIDForProcessorID } from './trace';
+import { TraceNode, getProcessorIDForSpanID, getSpanIDForProcessorID } from './trace';
 import { formatNanos } from "./format";
 import { QueryPlan } from './planView/model';
 import { QueryPlanGraph } from './planView/QueryPlanGraph';
@@ -35,7 +35,6 @@ interface TraceAndSidebarProps {
 
 interface TraceAndSidebarState {
   traceState: TraceViewState;
-  hoveredProcessorID: number | null;
 }
 
 class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarState> {
@@ -44,7 +43,6 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
     super(props);
     this.state = {
       traceState: initialState,
-      hoveredProcessorID: null,
     };
   }
 
@@ -52,11 +50,10 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
     const traceState = update(this.state.traceState, action);
     switch (action.type) {
       case HOVER_SPAN: {
-        const processorID = processorIDForSpanID(this.props.trace, action.spanID);
+        const processorID = getProcessorIDForSpanID(this.props.trace, action.spanID);
+        console.log("HOVER_SPAN", action.spanID, processorID);
         if (processorID !== null) {
-          this.setState({
-            hoveredProcessorID: processorID,
-          });
+          traceState.hoveredProcessorID = processorID;
         }
         break;
       }
@@ -141,7 +138,7 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
             </pre>
             <QueryPlanGraph
               plan={this.props.plan}
-              hoveredProcessorID={this.state.hoveredProcessorID}
+              hoveredProcessorID={this.state.traceState.hoveredProcessorID}
               onHoverProcessor={this.handleHoverProcessor}
             />
           </React.Fragment>
