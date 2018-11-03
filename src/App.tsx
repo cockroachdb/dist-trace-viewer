@@ -2,26 +2,33 @@ import React from "react";
 import TraceAndSidebar from "./TraceAndSidebar";
 
 import "./trace";
-import exampleTraceCSV from "./exampleTraceCSV";
 import { parseCSV, TraceNode } from "./trace";
-import { QueryPlanGraph } from "./planView/QueryPlanGraph";
 
 import { decode } from "./planView/decode";
-import exampleQueryPlans from "./planView/examples";
+import { QueryPlan } from "./planView/model";
+import examples from "./examples";
 
 interface AppState {
-  parseError: Error | null;
+  // Trace stuff.
   traceText: string;
+  traceParseError: Error | null;
   trace: TraceNode | null;
+  // Plan stuff.
+  planURLText: string;
+  planParseError: Error | null;
+  queryPlan: QueryPlan | null;
 }
 
 class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
     this.state = {
-      parseError: null,
-      traceText: exampleTraceCSV,
+      traceText: examples[0].trace,
+      traceParseError: null,
       trace: null,
+      planURLText: examples[0].explain,
+      planParseError: null,
+      queryPlan: null,
     };
   }
 
@@ -31,7 +38,14 @@ class App extends React.Component<{}, AppState> {
     });
   }
 
+  handleChangePlanURLText = (evt: React.FormEvent<HTMLTextAreaElement>) => {
+    this.setState({
+      planURLText: evt.currentTarget.value,
+    });
+  }
+
   handleSubmit = () => {
+    // Parse trace.
     try {
       const trace = parseCSV(this.state.traceText);
       console.log("trace:", trace);
@@ -39,16 +53,31 @@ class App extends React.Component<{}, AppState> {
         trace,
       });
     } catch (e) {
-      console.error("parse error:", e);
+      console.error("parse error in trace:", e);
       this.setState({
-        parseError: e,
+        traceParseError: e,
+      });
+    }
+    // Parse URL.
+    try {
+      const url = new URL(this.state.planURLText);
+      const plan = decode(url.hash.slice(1));
+      console.log(plan);
+      this.setState({
+        queryPlan: plan,
+      })
+    } catch (e) {
+      console.error("parse error in plan:", e);
+      this.setState({
+        planParseError: e,
       });
     }
   }
 
   handleExample = () => {
     this.setState({
-      traceText: exampleTraceCSV,
+      traceText: examples[0].trace,
+      planURLText: examples[0].explain,
     });
   }
 
@@ -59,16 +88,9 @@ class App extends React.Component<{}, AppState> {
   }
 
   render() {
-    if (this.state.trace === null) {
+    if (this.state.trace === null || this.state.queryPlan === null) {
       return (
         <div style={{ paddingLeft: 50, paddingTop: 10 }}>
-
-          <div style={{ width: 500, height: 500, border: "solid black 1px" }}>
-            <QueryPlanGraph
-              plan={decode(exampleQueryPlans[2])}
-            />
-          </div>
-
           <h1>Paste A Trace as CSV</h1>
           <textarea
             value={this.state.traceText}
@@ -79,10 +101,25 @@ class App extends React.Component<{}, AppState> {
             spellCheck={false}
           />
           <br />
+          <textarea
+            value={this.state.planURLText}
+            onChange={this.handleChangePlanURLText}
+            style={{ fontFamily: "monospace" }}
+            cols={80}
+            rows={7}
+          />
+          <br />
           <button onClick={this.handleSubmit} role="submit" className="btn btn-primary">Visualize</button>
           <br />
-          {this.state.parseError
-            ? <pre style={{ whiteSpace: "pre-wrap", color: "red" }}>Parse error: {this.state.parseError.message}</pre>
+          {this.state.traceParseError
+            ? <pre style={{ whiteSpace: "pre-wrap", color: "red" }}>
+                Trace parse error: {this.state.traceParseError.message}
+              </pre>
+            : null}
+          {this.state.planParseError
+            ? <pre style={{ whiteSpace: "pre-wrap", color: "red" }}>
+                Plan parse error: {this.state.planParseError.message}
+              </pre>
             : null}
           <br />
           <button onClick={this.handleExample} className="btn btn-secondary">Example</button>
