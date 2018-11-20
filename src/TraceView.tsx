@@ -18,16 +18,17 @@ const toggleCollapsed = (spanID: number) => ({
   spanID,
 });
 
-const HOVER_SPAN = 'HOVER_SPAN';
+export const HOVER_SPAN = 'HOVER_SPAN';
 const hoverSpan = (spanID: number) => ({
   type: HOVER_SPAN,
   spanID,
 });
 
-const UN_HOVER_SPAN = 'UN_HOVER_SPAN';
-const unHoverSpan = {
-  type: UN_HOVER_SPAN,
-};
+export const HOVER_PROCESSOR = 'HOVER_PROCESSOR';
+const hoverProcessor = (processorID: number) => ({
+  type: HOVER_PROCESSOR,
+  processorID,
+});
 
 interface TraceViewProps {
   trace: TraceNode;
@@ -54,17 +55,20 @@ export function StringToColor(s: string) {
 
 export interface TraceViewState {
   hoveredSpanID: number;
+  hoveredProcessorID: number | null;
   collapsedSpanIDs: number[];
 }
 
 export const initialState: TraceViewState = {
-  hoveredSpanID: null,
+  hoveredSpanID: 0,
+  hoveredProcessorID: null,
   collapsedSpanIDs: [],
 };
 
 export interface Action {
   type: string;
   spanID?: number;
+  processorID?: number;
 }
 
 export function update(state: TraceViewState, action: Action): TraceViewState {
@@ -83,10 +87,10 @@ export function update(state: TraceViewState, action: Action): TraceViewState {
         ...state,
         hoveredSpanID: action.spanID,
       };
-    case UN_HOVER_SPAN:
+    case HOVER_PROCESSOR:
       return {
         ...state,
-        hoveredSpanID: null,
+        hoveredProcessorID: action.processorID,
       };
     default:
       return state;
@@ -175,7 +179,7 @@ class TraceView extends Component<TraceViewProps> {
           return (
             <g
               key={span.spanID}
-              style={{ cursor: "pointer" }}
+              style={{ cursor: isLeaf ? "default" : "pointer" }}
               onMouseOver={() => { this.handleAction(hoverSpan(span.spanID)); }}
               onClick={isLeaf ? null : () => { this.handleAction(toggleCollapsed(span.spanID)); }}
             >

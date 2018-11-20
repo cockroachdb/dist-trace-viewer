@@ -17,6 +17,7 @@ export interface TraceNode {
   duration: number; // ns
   messages: LogMessage[];
   children: TraceNode[];
+  attrs: { [key: string]: string } | null;
 }
 
 const EXPECTED_HEADING = ["span_idx", "message_idx", "timestamp", "duration", "operation", "loc", "tag", "message", "age"];
@@ -56,6 +57,42 @@ function rowsToTree(rows: TraceNode[]): TraceNode {
   return tree;
 }
 
+function setAttrsOnNodes(node: TraceNode) {
+  node.attrs = getAttrs(node.messages);
+  node.children.forEach((child) => {
+    setAttrsOnNodes(child);
+  });
+}
+
+const PROCESSOR_ID_ATTR = "cockroach.processorid";
+
+// TODO: index this, memoize it.
+export function getProcessorIDForSpanID(node: TraceNode, spanID: number): number {
+  if (node.spanID === spanID && node.attrs && node.attrs[PROCESSOR_ID_ATTR]) {
+    return parseInt(node.attrs[PROCESSOR_ID_ATTR]);
+  }
+  for (const child of node.children) {
+    const processorID = getProcessorIDForSpanID(child, spanID);
+    if (processorID !== null) {
+      return processorID;
+    }
+  };
+  return null;
+}
+
+export function getSpanIDForProcessorID(node: TraceNode, processorID: number): number {
+  if (node.attrs && node.attrs[PROCESSOR_ID_ATTR] && parseInt(node.attrs[PROCESSOR_ID_ATTR]) === processorID) {
+    return node.spanID;
+  }
+  for (const child of node.children) {
+    const spanID = getSpanIDForProcessorID(child, processorID);
+    if (spanID !== null) {
+      return spanID;
+    }
+  }
+  return null;
+}
+
 const durationRegex = /(?:(\d*)s)?(?:(\d*)ms)?(?:(\d*)μs)?(?:(\d*)ns)?/;
 
 // returns nanoseconds
@@ -70,6 +107,23 @@ function parseDuration(unsanitizedDur: string): number {
   const microseconds = 1000 * milliseconds + (matches[3] ? parseInt(matches[3]) : 0);
   const nanoseconds = 1000 * microseconds + (matches[4] ? parseInt(matches[4]) : 0);
   return nanoseconds;
+}
+
+const SPAN_START = "=== SPAN START:";
+
+function getAttrs(messages: LogMessage[]): { [key: string]: string } {
+  if (messages.length === 0) {
+    return null;
+  }
+  const firstMessage = messages[0];
+  const matchIdx = firstMessage.message.search(SPAN_START);
+  if (matchIdx !== 0) {
+    return null;
+  }
+  const attrLines = firstMessage.message.split("\n").slice(1);
+  return _.fromPairs(attrLines.map((line) => (
+    line.split(": ")
+  )));
 }
 
 function parseRow(columns: string[]): TraceNode {
@@ -91,6 +145,7 @@ function parseRow(columns: string[]): TraceNode {
       },
     ],
     children: [],
+    attrs: null, // filled in later.
   }
 }
 
@@ -109,5 +164,7 @@ export function parseCSV(csvText: string): TraceNode {
   }
 
   const parsedRows = _.map(rows.slice(1), row => parseRow(row));
-  return rowsToTree(parsedRows);
+  const tree = rowsToTree(parsedRows);
+  setAttrsOnNodes(tree);
+  return tree;
 }

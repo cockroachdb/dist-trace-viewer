@@ -1,0 +1,77 @@
+.query-plan-graph {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.query-plan-graph .background {
+  stroke: black;
+  stroke-width: 2px;
+  fill: white;
+}
+
+.query-plan-graph .node {
+  stroke: black;
+  stroke-width: 1px;
+  cursor: move;
+  fill: beige;
+}
+
+.query-plan-graph .core {
+  stroke: black;
+  stroke-width: 1px;
+  fill: #ffffcc;
+}
+
+.query-plan-graph .core.selected {
+  fill: #d5d5aa;
+}
+
+.query-plan-graph .synchronizer {
+  stroke: black;
+  stroke-width: 1px;
+  fill: #80b3ff;
+}
+
+.query-plan-graph .router {
+  stroke: black;
+  stroke-width: 1px;
+  fill: #ffb380;
+}
+
+.query-plan-graph .link {
+  fill: none;
+  stroke: #000;
+  stroke-width: 3px;
+  opacity: 0.7;
+  marker-end: url(#end-arrow);
+}
+
+.query-plan-graph .linkinvisible {
+  fill: none;
+  stroke: none;
+}
+
+.query-plan-graph .label {
+  fill: black;
+  font-family: Verdana;
+  font-size: 16px;
+  text-anchor: middle;
+  pointer-events: none;
+}
+
+.query-plan-graph .guideline {
+  stroke: orangered;
+  stroke-width: 4px;
+}
+
+.query-plan-graph .tooltip {
+  background: #eeeeee;
+  border-color: black;
+  border-style: solid;
+  border-width: 1px;
+  font-size: 12px;
+  padding: 2px;
+  position: absolute;
+  visibility: hidden;
+}

@@ -2,22 +2,37 @@ import React from "react";
 import TraceAndSidebar from "./TraceAndSidebar";
 
 import "./trace";
-import exampleTraceCSV from "./exampleTraceCSV";
 import { parseCSV, TraceNode } from "./trace";
 
+import { decode } from "./planView/decode";
+import { QueryPlan } from "./planView/model";
+import examples from "./examples";
+
 interface AppState {
-  parseError: Error | null;
+  queryText: string;
+  explainText: string;
+  // Trace stuff.
   traceText: string;
+  traceParseError: Error | null;
   trace: TraceNode | null;
+  // Plan stuff.
+  planURLText: string;
+  planParseError: Error | null;
+  queryPlan: QueryPlan | null;
 }
 
 class App extends React.Component<{}, AppState> {
   constructor(props: {}) {
     super(props);
     this.state = {
-      parseError: null,
-      traceText: exampleTraceCSV,
+      queryText: examples[0].query,
+      explainText: examples[0].explain,
+      traceText: examples[0].trace,
+      traceParseError: null,
       trace: null,
+      planURLText: examples[0].explainDistSQL,
+      planParseError: null,
+      queryPlan: null,
     };
   }
 
@@ -27,7 +42,26 @@ class App extends React.Component<{}, AppState> {
     });
   }
 
+  handleChangePlanURLText = (evt: React.FormEvent<HTMLTextAreaElement>) => {
+    this.setState({
+      planURLText: evt.currentTarget.value,
+    });
+  }
+
+  handleChangeQueryText = (evt: React.FormEvent<HTMLTextAreaElement>) => {
+    this.setState({
+      queryText: evt.currentTarget.value,
+    });
+  }
+
+  handleChangeExplainText = (evt: React.FormEvent<HTMLTextAreaElement>) => {
+    this.setState({
+      explainText: evt.currentTarget.value,
+    });
+  }
+
   handleSubmit = () => {
+    // Parse trace.
     try {
       const trace = parseCSV(this.state.traceText);
       console.log("trace:", trace);
@@ -35,16 +69,34 @@ class App extends React.Component<{}, AppState> {
         trace,
       });
     } catch (e) {
-      console.error("parse error:", e);
+      console.error("parse error in trace:", e);
       this.setState({
-        parseError: e,
+        traceParseError: e,
+      });
+    }
+    // Parse URL.
+    try {
+      const url = new URL(this.state.planURLText);
+      const plan = decode(url.hash.slice(1));
+      console.log(plan);
+      this.setState({
+        queryPlan: plan,
+      })
+    } catch (e) {
+      console.error("parse error in plan:", e);
+      this.setState({
+        planParseError: e,
       });
     }
   }
 
   handleExample = () => {
+    const example = examples[0];
     this.setState({
-      traceText: exampleTraceCSV,
+      queryText: example.query,
+      explainText: example.explain,
+      traceText: example.trace,
+      planURLText: example.explain,
     });
   }
 
@@ -55,23 +107,54 @@ class App extends React.Component<{}, AppState> {
   }
 
   render() {
-    if (this.state.trace === null) {
+    if (this.state.trace === null || this.state.queryPlan === null) {
       return (
         <div style={{ paddingLeft: 50, paddingTop: 10 }}>
           <h1>Paste A Trace as CSV</h1>
+          <textarea
+            value={this.state.queryText}
+            placeholder="SQL Query"
+            style={{ fontFamily: "monospace", whiteSpace: "pre" }}
+            cols={80}
+            onChange={this.handleChangeQueryText}
+          />
+          <br />
+          <textarea
+            value={this.state.explainText}
+            onChange={this.handleChangeExplainText}
+            style={{ fontFamily: "monospace", whiteSpace: "pre" }}
+            cols={80}
+            rows={6}
+          />
+          <br />
           <textarea
             value={this.state.traceText}
             onChange={this.handleChangeTraceText}
             style={{ fontFamily: "monospace", whiteSpace: "pre" }}
             cols={80}
-            rows={30}
+            rows={20}
             spellCheck={false}
+          />
+          <br />
+          <textarea
+            value={this.state.planURLText}
+            onChange={this.handleChangePlanURLText}
+            style={{ fontFamily: "monospace" }}
+            cols={80}
+            rows={7}
           />
           <br />
           <button onClick={this.handleSubmit} role="submit" className="btn btn-primary">Visualize</button>
           <br />
-          {this.state.parseError
-            ? <pre style={{ whiteSpace: "pre-wrap", color: "red" }}>Parse error: {this.state.parseError.message}</pre>
+          {this.state.traceParseError
+            ? <pre style={{ whiteSpace: "pre-wrap", color: "red" }}>
+                Trace parse error: {this.state.traceParseError.message}
+              </pre>
+            : null}
+          {this.state.planParseError
+            ? <pre style={{ whiteSpace: "pre-wrap", color: "red" }}>
+                Plan parse error: {this.state.planParseError.message}
+              </pre>
             : null}
           <br />
           <button onClick={this.handleExample} className="btn btn-secondary">Example</button>
@@ -89,7 +172,13 @@ class App extends React.Component<{}, AppState> {
     }
 
     return (
-      <TraceAndSidebar trace={this.state.trace} onClear={this.handleClearTrace} />
+      <TraceAndSidebar
+        query={this.state.queryText}
+        explain={this.state.explainText}
+        trace={this.state.trace}
+        plan={this.state.queryPlan}
+        onClear={this.handleClearTrace}
+      />
     );
   }
 }
