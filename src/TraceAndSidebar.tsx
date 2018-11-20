@@ -62,6 +62,10 @@ class TraceAndSidebar extends Component<TraceAndSidebarProps, TraceAndSidebarSta
               <th>Duration:</th>
               <td>{formatNanos(span.duration)}</td>
             </tr>
+            <tr>
+              <th>Tag:</th>
+              <td>{span.tag}</td>
+            </tr>
           </tbody>
         </table>
         <h3>Log Messages</h3>

@@ -110,6 +110,19 @@ function flatten(tree: TraceNode, collapsed: number[]) {
   return output;
 }
 
+function pullNodeIDFromTag(tag: string) {
+  if (tag.length === 0) {
+    return '';
+  }
+  // TODO(bram): use a regex for this instead of this by hand ugliness. And move
+  // this to the tree building instead of here.
+  const firstComma = tag.indexOf(',');
+  if (firstComma > 0) {
+    return tag.substr(1, firstComma - 1);
+  }
+  return tag.substr(1, tag.length - 2);
+}
+
 const MICROSECOND = 1000;
 const MILLISECOND = 1000 * MICROSECOND;
 
@@ -149,14 +162,16 @@ class TraceView extends Component<TraceViewProps> {
           const isCollapsed = _.includes(collapsedSpanIDs, span.spanID);
           const timeLabel = formatNanos(span.duration);
           const isLeaf = span.children.length === 0;
+          const nodeID = pullNodeIDFromTag(span.tag);
+          const nodeIDDisplay = nodeID ? ': ' + nodeID : '';
           const label = isLeaf
-            ? `${timeLabel} : ${span.operation}`
+            ? `${timeLabel} : ${span.operation} ${nodeIDDisplay}`
             : isCollapsed
-              ? `${SIDE_ARROW} ${timeLabel} : ${span.operation} (${numDescendants(span)})`
-              : `${DOWN_ARROW} ${timeLabel} : ${span.operation}`;
+              ? `${SIDE_ARROW} ${timeLabel} : ${span.operation} ${nodeIDDisplay} (${numDescendants(span)})`
+              : `${DOWN_ARROW} ${timeLabel} : ${span.operation} ${nodeIDDisplay}`;
           const startTS = span.timestamp.toMillis();
           const endTS = span.timestamp.toMillis() + span.duration / MILLISECOND;
-          const color = StringToColor(span.operation)
+          const color = StringToColor(span.operation);
           return (
             <g
               key={span.spanID}
