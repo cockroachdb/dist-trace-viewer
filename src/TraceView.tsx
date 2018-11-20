@@ -4,6 +4,7 @@ import { numDescendants } from "./tree";
 import { TraceNode } from "./trace";
 import { formatNanos } from "./format";
 import * as d3scale from "d3-scale";
+import * as d3chromatic from "d3-scale-chromatic";
 
 const HEIGHT = 30;
 const HEIGHT_PLUS_SPACE = HEIGHT + 5;
@@ -33,6 +34,22 @@ interface TraceViewProps {
   width: number;
   traceState: TraceViewState;
   handleAction: (action: any) => void;
+}
+
+export function HashString(s: string) {
+  var hash = 0;
+  for (var i = 0; i < s.length; i++) {
+    hash = (hash << 5) - hash + s.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash);
+};
+
+
+const colors = d3chromatic.schemeSpectral[11];
+
+export function StringToColour(s: string) {
+  return colors[HashString(s) % colors.length]
 }
 
 export interface TraceViewState {
@@ -115,7 +132,7 @@ class TraceView extends Component<TraceViewProps> {
     const flattened = flatten(trace, collapsedSpanIDs);
     // TODO(vilterp): convert to age
     const firstTS = trace.timestamp.toMillis();
-    const lastTS = _.max(flattened.map((span) => (span.timestamp.toMillis() + (span.duration/MILLISECOND))));
+    const lastTS = _.max(flattened.map((span) => (span.timestamp.toMillis() + (span.duration / MILLISECOND))));
 
     const scale = d3scale
       .scaleLinear()
@@ -139,6 +156,7 @@ class TraceView extends Component<TraceViewProps> {
               : `${DOWN_ARROW} ${timeLabel} : ${span.operation}`;
           const startTS = span.timestamp.toMillis();
           const endTS = span.timestamp.toMillis() + span.duration / MILLISECOND;
+          const color = StringToColour(span.operation)
           return (
             <g
               key={span.spanID}
@@ -154,7 +172,7 @@ class TraceView extends Component<TraceViewProps> {
                 width={width}
               />
               <rect
-                fill="lightblue"
+                fill={color}
                 y={idx * HEIGHT_PLUS_SPACE - 5}
                 x={scale(startTS)}
                 height={HEIGHT}
@@ -162,7 +180,7 @@ class TraceView extends Component<TraceViewProps> {
               />
               <text
                 x={scale(startTS) + 5}
-                y={idx * HEIGHT_PLUS_SPACE + HEIGHT/2}
+                y={idx * HEIGHT_PLUS_SPACE + HEIGHT / 2}
                 style={{ textDecoration: isHovered ? "underline" : "none" }}
               >
                 {label}
@@ -185,7 +203,6 @@ class TraceView extends Component<TraceViewProps> {
       </svg>
     );
   }
-
 }
 
 export default TraceView;
