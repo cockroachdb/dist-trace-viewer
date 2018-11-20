@@ -28,6 +28,9 @@ function rowsToTree(rows: TraceNode[]): TraceNode {
     let cur = _.last(stack);
     if (row.spanID == cur.spanID) {
       cur.messages.push(...row.messages);
+      if ((cur.tag.length == 0) && (row.tag.length > 0)) {
+        cur.tag = row.tag;
+      }
     } else if (row.spanID > cur.spanID) {
       // Normally, this span should be a child of the cur span, but there are
       // cases in which this new span was actually created on a higher span so
